@@ -18,9 +18,9 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
 
   <meta name="theme-color" content="#07131f">
 
-  <title>WealthScope — Advanced Wealth Calculator</title>
+  <title>WealthScope - Advanced Wealth Calculator</title>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260615.4">
 
   <!-- Chart.js powers the allocation, growth and income charts. -->
 
@@ -31,13 +31,13 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
 
   <!-- Data files load before the calculation engine. -->
 
-  <script src="data/federal-2026.js" defer></script>
+  <script src="data/federal-2026.js?v=20260615.4" defer></script>
 
-  <script src="data/states.js" defer></script>
+  <script src="data/states.js?v=20260615.4" defer></script>
 
-  <script src="data/assets.js" defer></script>
+  <script src="data/assets.js?v=20260615.4" defer></script>
 
-  <script src="app.js" defer></script>
+  <script src="app.js?v=20260615.4" defer></script>
 
 </head>
 
@@ -51,7 +51,6 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
 
   <div class="app-shell" id="appShell">
 
-```
 <!-- =========================================================
      HEADER
 ========================================================== -->
@@ -123,7 +122,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
     id="closeStatusButton"
     aria-label="Close status message"
   >
-    ×
+    &times;
   </button>
 </section>
 
@@ -989,7 +988,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
       <article class="kpi-card">
 
         <div class="kpi-label">
-          Value in today’s dollars
+          Value in today's dollars
         </div>
 
         <div class="kpi-value warning" id="realValue">
@@ -1117,7 +1116,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
 
               <span class="legend-item">
                 <i class="legend-dot real-dot"></i>
-                Today’s dollars
+                today's dollars
               </span>
 
             </div>
@@ -1138,7 +1137,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
         <article class="result-card">
 
           <div class="card-kicker">
-            First-year income
+            First payout-year income
           </div>
 
           <h2>
@@ -1377,7 +1376,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
               <span>Tax efficiency</span>
 
               <strong id="taxEfficiencyScore">
-                —
+                -
               </strong>
 
             </div>
@@ -1686,7 +1685,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
               <span>Tax method</span>
 
               <strong id="stateTaxMethod">
-                —
+                -
               </strong>
 
             </div>
@@ -1716,7 +1715,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
               <span>Capital-gain treatment</span>
 
               <strong id="stateCapitalGainTreatment">
-                —
+                -
               </strong>
 
             </div>
@@ -2008,7 +2007,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
           </strong>
 
           <span id="conservativeRealValue">
-            $0 in today’s dollars
+            $0 in today's dollars
           </span>
 
         </article>
@@ -2028,7 +2027,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
           </strong>
 
           <span id="planningRealValue">
-            $0 in today’s dollars
+            $0 in today's dollars
           </span>
 
         </article>
@@ -2048,7 +2047,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
           </strong>
 
           <span id="speculativeRealValue">
-            $0 in today’s dollars
+            $0 in today's dollars
           </span>
 
         </article>
@@ -2305,7 +2304,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
                 <th>Cost basis</th>
                 <th>Liquidation tax</th>
                 <th>Net value</th>
-                <th>Today’s dollars</th>
+                <th>today's dollars</th>
               </tr>
 
             </thead>
@@ -2343,7 +2342,6 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
   </main>
 
 </div>
-```
 
   </div>
 
@@ -2353,7 +2351,6 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
 
   <dialog class="app-dialog" id="saveScenarioDialog">
 
-```
 <form method="dialog" id="saveScenarioForm">
 
   <div class="dialog-heading">
@@ -2376,7 +2373,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
       value="cancel"
       aria-label="Close dialog"
     >
-      ×
+      &times;
     </button>
 
   </div>
@@ -2418,7 +2415,6 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
   </div>
 
 </form>
-```
 
   </dialog>
 
@@ -2428,7 +2424,6 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
 
   <dialog class="app-dialog" id="loadScenarioDialog">
 
-```
 <div class="dialog-heading">
 
   <div>
@@ -2449,14 +2444,13 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
     id="closeLoadScenarioDialogButton"
     aria-label="Close dialog"
   >
-    ×
+    &times;
   </button>
 
 </div>
 
 <div class="saved-scenario-list" id="savedScenarioList">
 </div>
-```
 
   </dialog>
 
@@ -2466,7 +2460,6 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
 
   <dialog class="app-dialog" id="customAssetDialog">
 
-```
 <form method="dialog" id="customAssetForm">
 
   <div class="dialog-heading">
@@ -2489,7 +2482,7 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
       value="cancel"
       aria-label="Close dialog"
     >
-      ×
+      &times;
     </button>
 
   </div>
@@ -2667,7 +2660,6 @@ content="WealthScope advanced investment, tax, income, allocation and annuity ca
   </div>
 
 </form>
-```
 
   </dialog>
 

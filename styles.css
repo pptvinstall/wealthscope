@@ -727,6 +727,30 @@ scrollbar-width: none;
 display: none;
 }
 
+@media (max-width: 700px) {
+
+.result-tabs {
+padding-right: 36px;
+
+-webkit-mask-image:
+linear-gradient(
+to right,
+#000 0,
+#000 calc(100% - 32px),
+transparent 100%
+);
+
+mask-image:
+linear-gradient(
+to right,
+#000 0,
+#000 calc(100% - 32px),
+transparent 100%
+);
+}
+
+}
+
 .result-tab {
 flex: 0 0 auto;
 
@@ -1482,7 +1506,7 @@ background: #451721;
 }
 
 /* =========================================================
-RESPONSIVE — MEDIUM
+RESPONSIVE - MEDIUM
 ========================================================= */
 
 @media (max-width: 1180px) {
@@ -1503,9 +1527,7 @@ display: block;
 .header-actions {
 justify-content: flex-start;
 
-```
 margin-top: 14px;
-```
 
 }
 
@@ -1516,9 +1538,7 @@ grid-template-columns: 1fr;
 .control-panel {
 position: static;
 
-```
 max-height: none;
-```
 
 }
 
@@ -1528,7 +1548,7 @@ grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 /* =========================================================
-RESPONSIVE — SMALL
+RESPONSIVE - SMALL
 ========================================================= */
 
 @media (max-width: 700px) {
@@ -1590,9 +1610,7 @@ margin-top: 10px;
 .chart-legend {
 justify-content: flex-start;
 
-```
 margin-top: 10px;
-```
 
 }
 
@@ -1602,7 +1620,7 @@ grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 /* =========================================================
-RESPONSIVE — EXTRA SMALL
+RESPONSIVE - EXTRA SMALL
 ========================================================= */
 
 @media (max-width: 470px) {

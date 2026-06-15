@@ -66,6 +66,8 @@ colors: [
 
 };
 
+let statusDismissTimeoutId = null;
+
 /* =========================================================
 DATASET REFERENCES
 ========================================================= */
@@ -273,9 +275,31 @@ if (type === "success") {
 banner.classList.add("is-success");
 }
 
+if (statusDismissTimeoutId !== null) {
+window.clearTimeout(
+statusDismissTimeoutId
+);
+statusDismissTimeoutId = null;
+}
+
+if (type === "success") {
+statusDismissTimeoutId =
+window.setTimeout(
+hideStatus,
+4500
+);
+}
+
 }
 
 function hideStatus() {
+
+if (statusDismissTimeoutId !== null) {
+window.clearTimeout(
+statusDismissTimeoutId
+);
+statusDismissTimeoutId = null;
+}
 
 const banner =
 getElement("appStatus");
@@ -1390,31 +1414,174 @@ state.taxMethod ===
 "limited"
 ) {
 
-/*
-  Washington-style special capital gain treatment
-  is intentionally not guessed here.
-*/
+const specialTax =
+state.specialTax;
+
+const eligibleGain =
+inputs.moneySource ===
+"longTermGain"
+  ? inputs.startingAmount
+  : inputs.moneySource ===
+    "businessSale"
+    ? inputs.startingAmount
+      *
+      0.8
+    : 0;
+
+const annualDeduction =
+specialTax
+?.annualDeduction
+||
+0;
+
+const washingtonTaxableGain =
+Math.max(
+0,
+eligibleGain
+-
+annualDeduction
+);
+
+const rateRows = [];
 
 if (
-  [
-    "longTermGain",
-    "businessSale"
-  ].includes(
-    inputs.moneySource
-  )
+inputs.stateRateOverride !==
+null
 ) {
 
-  stateTax =
-    inputs.stateRateOverride !== null
-      ? taxableAmount
-        *
-        rate
-      : 0;
+stateTax =
+washingtonTaxableGain
+*
+rate;
 
-  explanation +=
-    " A manual state-rate override is recommended for this transaction.";
+if (washingtonTaxableGain > 0) {
+rateRows.push({
+  label:
+    "Manual override",
+  taxableAmount:
+    washingtonTaxableGain,
+  rate,
+  tax:
+    stateTax
+});
+}
+
+} else {
+
+specialTax
+?.rateStructure
+?.forEach(
+tier => {
+
+  const tierTop =
+    tier.maximum === null
+      ? washingtonTaxableGain
+      : Math.min(
+          washingtonTaxableGain,
+          tier.maximum
+        );
+
+  const tierAmount =
+    Math.max(
+      0,
+      tierTop
+      -
+      tier.minimum
+    );
+
+  if (tierAmount <= 0) {
+    return;
+  }
+
+  const tierTax =
+    tierAmount
+    *
+    tier.rate;
+
+  stateTax +=
+    tierTax;
+
+  rateRows.push({
+    label:
+      tier.maximum === null
+        ? `Gain above ${formatCurrency(tier.minimum)}`
+        : `First ${formatCurrency(tier.maximum)} of taxable gain`,
+    taxableAmount:
+      tierAmount,
+    rate:
+      tier.rate,
+    tax:
+      tierTax
+  });
 
 }
+);
+
+}
+
+const localTax =
+washingtonTaxableGain
+*
+inputs.localTaxRate;
+
+const explanationParts = [
+state.explanation,
+`Washington-allocated long-term gain modeled: ${formatCurrency(eligibleGain)}.`,
+`Tax year ${specialTax.effectiveTaxYear} annual deduction: ${formatCurrency(annualDeduction)}.`,
+`Taxable Washington capital gain: ${formatCurrency(washingtonTaxableGain)}.`
+];
+
+rateRows.forEach(
+row => {
+  explanationParts.push(
+    `${row.label} at ${formatPercent(row.rate)}: ${formatCurrency(row.tax)}.`
+  );
+}
+);
+
+explanationParts.push(
+specialTax
+.simplifiedEstimateWarning
+);
+
+return {
+state,
+taxableAmount:
+  washingtonTaxableGain,
+annualDeduction,
+rate,
+stateTax,
+localTax,
+totalStateAndLocalTax:
+  stateTax
+  +
+  localTax,
+explanation:
+  explanationParts
+  .join(" "),
+modelStatus:
+  state.modelStatus,
+taxMethodLabel:
+  "Washington capital-gains excise-tax estimate",
+capitalGainTreatmentLabel:
+  "Washington-allocated long-term gains only",
+specialTaxDetails: {
+  eligibleGain,
+  annualDeduction,
+  taxableGain:
+    washingtonTaxableGain,
+  rateRows,
+  effectiveTaxYear:
+    specialTax
+    .effectiveTaxYear,
+  source:
+    specialTax
+    .source,
+  lastReviewed:
+    specialTax
+    .lastReviewed
+}
+};
 
 } else {
 
@@ -3524,20 +3691,35 @@ body
 .forEach(
 input => {
 
+  const updateAllocation =
+    debounce(
+      (
+        assetId,
+        allocation
+      ) => {
+
+        updateAllocationValue(
+          assetId,
+          allocation
+        );
+
+      },
+      240
+    );
+
   input.addEventListener(
-    "change",
+    "input",
     event => {
 
-      updateAllocationValue(
-        event
-        .currentTarget
+      const target =
+        event.currentTarget;
+
+      updateAllocation(
+        target
         .dataset
         .assetId,
-
         Number(
-          event
-          .currentTarget
-          .value
+          target.value
         )
         ||
         0
@@ -3831,6 +4013,9 @@ setText(
 
 setText(
 "stateTaxMethod",
+stateResult
+.taxMethodLabel
+||
 StateData
 .taxMethods[
 state.taxMethod
@@ -3843,8 +4028,13 @@ state.taxMethod
 setText(
 "stateDeduction",
 formatCurrency(
+(
+stateResult
+.annualDeduction
+??
 state
 .standardDeductionEstimate
+)
 ||
 0
 )
@@ -3860,6 +4050,9 @@ stateResult
 
 setText(
 "stateCapitalGainTreatment",
+stateResult
+.capitalGainTreatmentLabel
+||
 StateData
 .capitalGainTreatments[
 state
@@ -3987,6 +4180,13 @@ state.treasuryInterestStateExempt
   : "Treasury treatment review"
 
 ].filter(Boolean);
+
+if (state.specialTax) {
+badges.push(
+`Tax year ${state.specialTax.effectiveTaxYear}`,
+"Tiered long-term gain tax"
+);
+}
 
 container.innerHTML =
 badges
@@ -7139,6 +7339,140 @@ test(
     +
     1,
     "CSV row count does not match the schedule"
+  );
+
+}
+);
+
+test(
+"Washington gain below annual deduction",
+() => {
+
+  const result =
+    calculateStateUpfrontTax(
+      {
+        startingAmount:
+          200000,
+        moneySource:
+          "longTermGain",
+        stateCode:
+          "WA",
+        stateRateOverride:
+          null,
+        localTaxRate:
+          0
+      },
+      {}
+    );
+
+  assert(
+    Math.abs(
+      result.stateTax
+    )
+    <
+    0.01,
+    `Expected $0, received ${result.stateTax}`
+  );
+
+}
+);
+
+test(
+"Washington gain above annual deduction",
+() => {
+
+  const result =
+    calculateStateUpfrontTax(
+      {
+        startingAmount:
+          500000,
+        moneySource:
+          "longTermGain",
+        stateCode:
+          "WA",
+        stateRateOverride:
+          null,
+        localTaxRate:
+          0
+      },
+      {}
+    );
+
+  assert(
+    Math.abs(
+      result.stateTax
+      -
+      15540
+    )
+    <
+    0.01,
+    `Expected $15,540, received ${result.stateTax}`
+  );
+
+}
+);
+
+test(
+"Washington ordinary income remains untaxed",
+() => {
+
+  const result =
+    calculateStateUpfrontTax(
+      {
+        startingAmount:
+          500000,
+        moneySource:
+          "bonus",
+        stateCode:
+          "WA",
+        stateRateOverride:
+          null,
+        localTaxRate:
+          0
+      },
+      {}
+    );
+
+  assert(
+    Math.abs(
+      result.stateTax
+    )
+    <
+    0.01,
+    `Expected $0, received ${result.stateTax}`
+  );
+
+}
+);
+
+test(
+"Washington tax excludes after-tax cash",
+() => {
+
+  const result =
+    calculateStateUpfrontTax(
+      {
+        startingAmount:
+          500000,
+        moneySource:
+          "afterTaxCash",
+        stateCode:
+          "WA",
+        stateRateOverride:
+          null,
+        localTaxRate:
+          0
+      },
+      {}
+    );
+
+  assert(
+    Math.abs(
+      result.stateTax
+    )
+    <
+    0.01,
+    `Expected $0, received ${result.stateTax}`
   );
 
 }

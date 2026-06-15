@@ -46,6 +46,28 @@ const states = Object.fromEntries(stateRows.map(([code, name, planningRate]) => 
   }];
 }));
 
+states.WA = {
+  ...states.WA,
+  taxMethod: "limited",
+  capitalGainTreatment: "special",
+  treasuryInterestStateExempt: true,
+  standardDeductionEstimate: 278000,
+  specialTax: {
+    type: "washingtonCapitalGains",
+    effectiveTaxYear: 2025,
+    annualDeduction: 278000,
+    rateStructure: [
+      { minimum: 0, maximum: 1000000, rate: 0.07 },
+      { minimum: 1000000, maximum: null, rate: 0.099 }
+    ],
+    source: "https://dor.wa.gov/taxes-rates/other-taxes/capital-gains-tax",
+    rateSource: "https://dor.wa.gov/forms-publications/publications-subject/special-notices/new-tiered-rates-washingtons-capital-gains-tax",
+    lastReviewed: "2026-06-15",
+    simplifiedEstimateWarning: "Simplified estimate using Washington's latest published 2025 deduction. It assumes the entered long-term gain is Washington-allocated and non-exempt, and does not model credits or additional deductions for charitable contributions or qualifying family-owned businesses."
+  },
+  explanation: "Washington does not impose a broad individual income tax on wages or ordinary income. It does impose a separate excise tax on certain Washington-allocated long-term capital gains above an annual deduction."
+};
+
 function formatRate(rate) {
   return `${(rate * 100).toFixed(2).replace(/\.?0+$/, "")}%`;
 }
@@ -55,6 +77,7 @@ window.WEALTHSCOPE_STATES_2026 = {
   states,
   taxMethods: {
     none: { name: "No broad state income tax estimate" },
+    limited: { name: "Limited-income tax estimate" },
     estimated: { name: "Editable planning-rate estimate" }
   },
   modelStatuses: {
@@ -62,6 +85,7 @@ window.WEALTHSCOPE_STATES_2026 = {
   },
   capitalGainTreatments: {
     taxed: { name: "Modeled at the planning rate" },
+    special: { name: "Special long-term capital-gains tax modeled" },
     exempt: { name: "No broad state income tax estimate" }
   }
 };

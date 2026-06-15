@@ -727,6 +727,30 @@ scrollbar-width: none;
 display: none;
 }
 
+@media (max-width: 700px) {
+
+.result-tabs {
+padding-right: 36px;
+
+-webkit-mask-image:
+linear-gradient(
+to right,
+#000 0,
+#000 calc(100% - 32px),
+transparent 100%
+);
+
+mask-image:
+linear-gradient(
+to right,
+#000 0,
+#000 calc(100% - 32px),
+transparent 100%
+);
+}
+
+}
+
 .result-tab {
 flex: 0 0 auto;
 

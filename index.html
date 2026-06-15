@@ -1,1715 +1,2675 @@
 <!doctype html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WealthScope</title>
+  <meta charset="utf-8">
 
-<style>
-:root{
-  --bg:#07131f;
-  --card:#10263a;
-  --line:#294861;
-  --text:#eef7ff;
-  --muted:#9fb2c3;
-  --green:#67e4b3;
-  --blue:#7da9ff;
-  --gold:#ffca73;
-  --red:#ff8493;
-}
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1, viewport-fit=cover"
 
-*{
-  box-sizing:border-box;
-}
+>
 
-body{
-  margin:0;
-  background:linear-gradient(145deg,#07131f,#0c1c2b);
-  color:var(--text);
-  font:15px system-ui,-apple-system,Segoe UI,sans-serif;
-}
+<meta
+name="description"
+content="WealthScope advanced investment, tax, income, allocation and annuity calculator."
 
-.wrap{
-  max-width:1250px;
-  margin:auto;
-  padding:16px;
-}
+>
 
-h1{
-  font-size:clamp(3rem,8vw,5.5rem);
-  letter-spacing:-.06em;
-  margin:5px 0;
-}
+  <meta name="theme-color" content="#07131f">
 
-h1 span{
-  color:var(--green);
-}
+  <title>WealthScope — Advanced Wealth Calculator</title>
 
-.sub{
-  color:var(--muted);
-  max-width:760px;
-  line-height:1.5;
-}
+  <link rel="stylesheet" href="styles.css">
 
-.grid{
-  display:grid;
-  grid-template-columns:360px 1fr;
-  gap:14px;
-}
+  <!-- Chart.js powers the allocation, growth and income charts. -->
 
-.panel{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:18px;
-}
+  <script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+    defer
+  ></script>
 
-.controls{
-  padding:15px;
-}
+  <!-- Data files load before the calculation engine. -->
 
-.section{
-  padding:12px 0;
-  border-bottom:1px solid var(--line);
-}
+  <script src="data/federal-2026.js" defer></script>
 
-.section:last-child{
-  border:0;
-}
+  <script src="data/states.js" defer></script>
 
-.section h3{
-  margin:0 0 8px;
-}
+  <script src="data/assets.js" defer></script>
 
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
+  <script src="app.js" defer></script>
 
-label{
-  display:block;
-  color:var(--muted);
-  font-size:.68rem;
-  font-weight:800;
-  text-transform:uppercase;
-  margin:7px 0 4px;
-}
-
-input,
-select{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #365772;
-  background:#081725;
-  color:var(--text);
-}
-
-button{
-  font:inherit;
-}
-
-.go{
-  width:100%;
-  padding:12px;
-  border:0;
-  border-radius:11px;
-  background:linear-gradient(135deg,var(--green),#66bfff);
-  font-weight:900;
-  color:#04111b;
-  margin-top:12px;
-}
-
-.main{
-  display:grid;
-  gap:12px;
-}
-
-.cards{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:9px;
-}
-
-.card{
-  padding:14px;
-}
-
-.k{
-  font-size:.68rem;
-  color:var(--muted);
-  font-weight:800;
-  text-transform:uppercase;
-}
-
-.v{
-  font-size:clamp(1.2rem,2.5vw,1.9rem);
-  font-weight:900;
-  margin-top:4px;
-}
-
-.good{
-  color:var(--green);
-}
-
-.blue{
-  color:var(--blue);
-}
-
-.gold{
-  color:var(--gold);
-}
-
-.bad{
-  color:var(--red);
-}
-
-.box{
-  padding:16px;
-}
-
-.metric{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  padding:8px 0;
-  border-bottom:1px solid var(--line);
-}
-
-.metric span{
-  color:var(--muted);
-}
-
-.split{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.scenario{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:9px;
-}
-
-.scenario > div{
-  padding:14px;
-  border:1px solid var(--line);
-  border-radius:13px;
-}
-
-.scenario strong{
-  display:block;
-  font-size:1.35rem;
-  margin-top:4px;
-}
-
-.tablewrap{
-  overflow:auto;
-  max-height:470px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:900px;
-  font-size:.78rem;
-}
-
-th,
-td{
-  padding:8px;
-  text-align:right;
-  border-bottom:1px solid var(--line);
-}
-
-th{
-  position:sticky;
-  top:0;
-  background:#15314a;
-}
-
-th:first-child,
-td:first-child{
-  text-align:left;
-}
-
-.note{
-  padding:14px;
-  color:var(--muted);
-  font-size:.75rem;
-  line-height:1.5;
-}
-
-.error{
-  display:none;
-  background:#411824;
-  border:1px solid var(--red);
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-
-@media(max-width:900px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .cards{
-    grid-template-columns:1fr 1fr;
-  }
-}
-
-@media(max-width:600px){
-  .row,
-  .split,
-  .scenario{
-    grid-template-columns:1fr;
-  }
-
-  .wrap{
-    padding:10px;
-  }
-}
-</style>
 </head>
 
 <body>
 
-<div class="wrap">
+  <noscript>
+    <div class="noscript-warning">
+      WealthScope requires JavaScript to calculate results.
+    </div>
+  </noscript>
 
-<h1>Wealth<span>Scope</span></h1>
+  <div class="app-shell" id="appShell">
 
-<p class="sub">
-A stable, mobile-friendly investment, tax, fee, inflation,
-withdrawal and annuity calculator.
-</p>
+```
+<!-- =========================================================
+     HEADER
+========================================================== -->
 
-<div class="grid">
+<header class="site-header">
 
-<aside class="panel controls">
+  <div class="brand-block">
 
-<div id="error" class="error"></div>
+    <div class="brand-kicker">
+      Advanced wealth modeling
+    </div>
 
-<div class="section">
+    <h1 class="brand-title">
+      Wealth<span>Scope</span>
+    </h1>
 
-<h3>Starting money</h3>
+    <p class="brand-subtitle">
+      See what you earn, what you lose, and what you actually keep.
+    </p>
 
-<label>Gross / starting amount</label>
-<input id="start" type="number" value="500000" min="0">
+  </div>
 
-<label>Money type</label>
+  <div class="header-actions">
 
-<select id="moneyType">
-  <option value="after">Already after-tax cash</option>
-  <option value="ordinary">Ordinary income / windfall</option>
-  <option value="lottery">Lottery / prize</option>
-  <option value="short">Short-term capital gain</option>
-  <option value="long">Long-term capital gain</option>
-  <option value="inheritance">Inheritance / non-taxable receipt</option>
-</select>
+    <button
+      type="button"
+      class="button button-secondary"
+      id="loadScenarioButton"
+    >
+      Load scenario
+    </button>
 
-<div class="row">
+    <button
+      type="button"
+      class="button button-secondary"
+      id="saveScenarioButton"
+    >
+      Save scenario
+    </button>
 
-<div>
-<label>Filing status</label>
+    <button
+      type="button"
+      class="button button-primary"
+      id="exportReportButton"
+    >
+      Export report
+    </button>
 
-<select id="filing">
-  <option value="single">Single</option>
-  <option value="joint">Married filing jointly</option>
-  <option value="separate">Married filing separately</option>
-  <option value="hoh">Head of household</option>
-</select>
-</div>
+  </div>
 
-<div>
-<label>State</label>
+</header>
 
-<select id="state">
-  <option value="AL">Alabama</option>
-  <option value="AK">Alaska</option>
-  <option value="AZ">Arizona</option>
-  <option value="AR">Arkansas</option>
-  <option value="CA">California</option>
-  <option value="CO">Colorado</option>
-  <option value="CT">Connecticut</option>
-  <option value="DE">Delaware</option>
-  <option value="DC">District of Columbia</option>
-  <option value="FL">Florida</option>
-  <option value="GA" selected>Georgia</option>
-  <option value="HI">Hawaii</option>
-  <option value="ID">Idaho</option>
-  <option value="IL">Illinois</option>
-  <option value="IN">Indiana</option>
-  <option value="IA">Iowa</option>
-  <option value="KS">Kansas</option>
-  <option value="KY">Kentucky</option>
-  <option value="LA">Louisiana</option>
-  <option value="ME">Maine</option>
-  <option value="MD">Maryland</option>
-  <option value="MA">Massachusetts</option>
-  <option value="MI">Michigan</option>
-  <option value="MN">Minnesota</option>
-  <option value="MS">Mississippi</option>
-  <option value="MO">Missouri</option>
-  <option value="MT">Montana</option>
-  <option value="NE">Nebraska</option>
-  <option value="NV">Nevada</option>
-  <option value="NH">New Hampshire</option>
-  <option value="NJ">New Jersey</option>
-  <option value="NM">New Mexico</option>
-  <option value="NY">New York</option>
-  <option value="NC">North Carolina</option>
-  <option value="ND">North Dakota</option>
-  <option value="OH">Ohio</option>
-  <option value="OK">Oklahoma</option>
-  <option value="OR">Oregon</option>
-  <option value="PA">Pennsylvania</option>
-  <option value="RI">Rhode Island</option>
-  <option value="SC">South Carolina</option>
-  <option value="SD">South Dakota</option>
-  <option value="TN">Tennessee</option>
-  <option value="TX">Texas</option>
-  <option value="UT">Utah</option>
-  <option value="VT">Vermont</option>
-  <option value="VA">Virginia</option>
-  <option value="WA">Washington</option>
-  <option value="WV">West Virginia</option>
-  <option value="WI">Wisconsin</option>
-  <option value="WY">Wyoming</option>
-</select>
-</div>
+<!-- =========================================================
+     APP STATUS / ERROR AREA
+========================================================== -->
 
-</div>
-
-<label>Other taxable income</label>
-<input id="otherIncome" type="number" value="0" min="0">
-
-<div class="row">
-
-<div>
-<label>State-rate override %</label>
-<input
-  id="stateOverride"
-  type="number"
-  placeholder="Use estimate"
-  step=".01"
+<section
+  class="status-banner"
+  id="appStatus"
+  role="status"
+  aria-live="polite"
+  hidden
 >
+  <span id="appStatusText"></span>
+
+  <button
+    type="button"
+    class="status-close"
+    id="closeStatusButton"
+    aria-label="Close status message"
+  >
+    ×
+  </button>
+</section>
+
+<!-- =========================================================
+     PRIMARY LAYOUT
+========================================================== -->
+
+<div class="workspace">
+
+  <!-- =======================================================
+       LEFT CONTROL PANEL
+  ======================================================== -->
+
+  <aside class="control-panel">
+
+    <!-- MODE SWITCH -->
+
+    <section class="control-section mode-section">
+
+      <div class="section-heading-row">
+
+        <div>
+          <div class="section-number">Mode</div>
+          <h2>How much control?</h2>
+        </div>
+
+        <div
+          class="segmented-control"
+          role="group"
+          aria-label="Calculator mode"
+        >
+
+          <button
+            type="button"
+            class="segment active"
+            id="simpleModeButton"
+            data-mode="simple"
+            aria-pressed="true"
+          >
+            Simple
+          </button>
+
+          <button
+            type="button"
+            class="segment"
+            id="advancedModeButton"
+            data-mode="advanced"
+            aria-pressed="false"
+          >
+            Advanced
+          </button>
+
+        </div>
+
+      </div>
+
+      <p class="section-help">
+        Simple mode handles the essentials. Advanced mode reveals tax,
+        investment, income and allocation assumptions.
+      </p>
+
+    </section>
+
+    <!-- STARTING MONEY -->
+
+    <section class="control-section">
+
+      <div class="section-number">1</div>
+      <h2>Starting money</h2>
+
+      <div class="field">
+
+        <label for="startingAmount">
+          Gross or starting amount
+        </label>
+
+        <div class="money-input">
+
+          <span aria-hidden="true">$</span>
+
+          <input
+            id="startingAmount"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="100"
+            value="500000"
+          >
+
+        </div>
+
+      </div>
+
+      <div class="field">
+
+        <label for="moneySource">
+          Where did the money come from?
+        </label>
+
+        <select id="moneySource">
+
+          <option value="afterTaxCash">
+            Already after-tax cash
+          </option>
+
+          <option value="salary">
+            Salary or ordinary income
+          </option>
+
+          <option value="bonus">
+            Bonus or one-time compensation
+          </option>
+
+          <option value="lottery">
+            Lottery or prize winnings
+          </option>
+
+          <option value="businessSale">
+            Business sale
+          </option>
+
+          <option value="shortTermGain">
+            Short-term capital gain
+          </option>
+
+          <option value="longTermGain">
+            Long-term capital gain
+          </option>
+
+          <option value="inheritance">
+            Inheritance
+          </option>
+
+          <option value="retirementBalance">
+            Existing retirement balance
+          </option>
+
+          <option value="custom">
+            Custom tax treatment
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="two-column-fields">
+
+        <div class="field">
+
+          <label for="filingStatus">
+            Filing status
+          </label>
+
+          <select id="filingStatus">
+
+            <option value="single">
+              Single
+            </option>
+
+            <option value="marriedJoint">
+              Married filing jointly
+            </option>
+
+            <option value="marriedSeparate">
+              Married filing separately
+            </option>
+
+            <option value="headOfHousehold">
+              Head of household
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label for="stateCode">
+            State
+          </label>
+
+          <select id="stateCode">
+            <option value="GA" selected>Georgia</option>
+          </select>
+
+        </div>
+
+      </div>
+
+      <div class="field">
+
+        <label for="otherIncome">
+          Other taxable income this year
+        </label>
+
+        <div class="money-input">
+
+          <span aria-hidden="true">$</span>
+
+          <input
+            id="otherIncome"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="100"
+            value="0"
+          >
+
+        </div>
+
+        <small>
+          Helps determine the marginal tax applied to a windfall or gain.
+        </small>
+
+      </div>
+
+      <div class="advanced-only" hidden>
+
+        <div class="two-column-fields">
+
+          <div class="field">
+
+            <label for="deductionMethod">
+              Federal deduction
+            </label>
+
+            <select id="deductionMethod">
+
+              <option value="standard">
+                Standard deduction
+              </option>
+
+              <option value="itemized">
+                Itemized deduction
+              </option>
+
+              <option value="none">
+                No deduction
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="field">
+
+            <label for="itemizedDeduction">
+              Itemized amount
+            </label>
+
+            <div class="money-input">
+
+              <span aria-hidden="true">$</span>
+
+              <input
+                id="itemizedDeduction"
+                type="number"
+                min="0"
+                step="100"
+                value="0"
+              >
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="two-column-fields">
+
+          <div class="field">
+
+            <label for="stateRateOverride">
+              State-rate override
+            </label>
+
+            <div class="percent-input">
+
+              <input
+                id="stateRateOverride"
+                type="number"
+                min="0"
+                max="25"
+                step="0.01"
+                placeholder="Automatic"
+              >
+
+              <span aria-hidden="true">%</span>
+
+            </div>
+
+          </div>
+
+          <div class="field">
+
+            <label for="localTaxRate">
+              Local income-tax rate
+            </label>
+
+            <div class="percent-input">
+
+              <input
+                id="localTaxRate"
+                type="number"
+                min="0"
+                max="10"
+                step="0.01"
+                value="0"
+              >
+
+              <span aria-hidden="true">%</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="two-column-fields">
+
+          <div class="field">
+
+            <label for="niItEnabled">
+              Net Investment Income Tax
+            </label>
+
+            <select id="niItEnabled">
+
+              <option value="auto">
+                Automatic
+              </option>
+
+              <option value="yes">
+                Include 3.8%
+              </option>
+
+              <option value="no">
+                Exclude
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="field">
+
+            <label for="customUpfrontTaxRate">
+              Custom upfront tax
+            </label>
+
+            <div class="percent-input">
+
+              <input
+                id="customUpfrontTaxRate"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="0"
+              >
+
+              <span aria-hidden="true">%</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- INVESTMENT PLAN -->
+
+    <section class="control-section">
+
+      <div class="section-number">2</div>
+      <h2>Investment plan</h2>
+
+      <div class="two-column-fields">
+
+        <div class="field">
+
+          <label for="investmentYears">
+            Years invested
+          </label>
+
+          <input
+            id="investmentYears"
+            type="number"
+            min="1"
+            max="100"
+            step="1"
+            value="30"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label for="inflationRate">
+            Inflation
+          </label>
+
+          <div class="percent-input">
+
+            <input
+              id="inflationRate"
+              type="number"
+              min="-5"
+              max="25"
+              step="0.1"
+              value="3"
+            >
+
+            <span aria-hidden="true">%</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="field">
+
+        <label for="riskProfile">
+          Investment style
+        </label>
+
+        <select id="riskProfile">
+
+          <option value="capitalPreservation">
+            Capital preservation
+          </option>
+
+          <option value="conservative">
+            Conservative
+          </option>
+
+          <option value="balanced" selected>
+            Balanced
+          </option>
+
+          <option value="growth">
+            Growth
+          </option>
+
+          <option value="aggressive">
+            Aggressive
+          </option>
+
+          <option value="custom">
+            Custom allocation
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="field">
+
+        <label for="monthlyContribution">
+          Additional monthly contribution
+        </label>
+
+        <div class="money-input">
+
+          <span aria-hidden="true">$</span>
+
+          <input
+            id="monthlyContribution"
+            type="number"
+            min="0"
+            step="25"
+            value="0"
+          >
+
+        </div>
+
+      </div>
+
+      <div class="advanced-only" hidden>
+
+        <div class="two-column-fields">
+
+          <div class="field">
+
+            <label for="contributionGrowthRate">
+              Annual contribution increase
+            </label>
+
+            <div class="percent-input">
+
+              <input
+                id="contributionGrowthRate"
+                type="number"
+                min="0"
+                max="25"
+                step="0.1"
+                value="0"
+              >
+
+              <span aria-hidden="true">%</span>
+
+            </div>
+
+          </div>
+
+          <div class="field">
+
+            <label for="rebalanceFrequency">
+              Rebalancing
+            </label>
+
+            <select id="rebalanceFrequency">
+
+              <option value="none">
+                Never
+              </option>
+
+              <option value="annual" selected>
+                Annually
+              </option>
+
+              <option value="quarterly">
+                Quarterly
+              </option>
+
+              <option value="monthly">
+                Monthly
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="two-column-fields">
+
+          <div class="field">
+
+            <label for="advisorFeeRate">
+              Advisor fee
+            </label>
+
+            <div class="percent-input">
+
+              <input
+                id="advisorFeeRate"
+                type="number"
+                min="0"
+                max="5"
+                step="0.01"
+                value="0"
+              >
+
+              <span aria-hidden="true">%</span>
+
+            </div>
+
+          </div>
+
+          <div class="field">
+
+            <label for="additionalAnnualFee">
+              Other annual fees
+            </label>
+
+            <div class="money-input">
+
+              <span aria-hidden="true">$</span>
+
+              <input
+                id="additionalAnnualFee"
+                type="number"
+                min="0"
+                step="10"
+                value="0"
+              >
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- INCOME GOAL -->
+
+    <section class="control-section">
+
+      <div class="section-number">3</div>
+      <h2>Income goal</h2>
+
+      <div class="field">
+
+        <label for="incomeStrategy">
+          How should the money pay you?
+        </label>
+
+        <select id="incomeStrategy">
+
+          <option value="none">
+            Let it grow
+          </option>
+
+          <option value="yieldOnly">
+            Spend portfolio income only
+          </option>
+
+          <option value="safeWithdrawal" selected>
+            Percentage withdrawal
+          </option>
+
+          <option value="fixedDollar">
+            Fixed monthly income
+          </option>
+
+          <option value="fixedPeriodAnnuity">
+            Fixed-period annuity
+          </option>
+
+          <option value="lotteryInstallments">
+            Growing lottery-style installments
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="two-column-fields">
+
+        <div class="field">
+
+          <label for="withdrawalRate">
+            Withdrawal rate
+          </label>
+
+          <div class="percent-input">
+
+            <input
+              id="withdrawalRate"
+              type="number"
+              min="0"
+              max="30"
+              step="0.1"
+              value="4"
+            >
+
+            <span aria-hidden="true">%</span>
+
+          </div>
+
+        </div>
+
+        <div class="field">
+
+          <label for="desiredMonthlyIncome">
+            Desired monthly income
+          </label>
+
+          <div class="money-input">
+
+            <span aria-hidden="true">$</span>
+
+            <input
+              id="desiredMonthlyIncome"
+              type="number"
+              min="0"
+              step="100"
+              value="0"
+            >
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="advanced-only" hidden>
+
+        <div class="two-column-fields">
+
+          <div class="field">
+
+            <label for="payoutYears">
+              Payout period
+            </label>
+
+            <div class="suffix-input">
+
+              <input
+                id="payoutYears"
+                type="number"
+                min="1"
+                max="100"
+                step="1"
+                value="30"
+              >
+
+              <span aria-hidden="true">years</span>
+
+            </div>
+
+          </div>
+
+          <div class="field">
+
+            <label for="payoutReturnRate">
+              Return during payout
+            </label>
+
+            <div class="percent-input">
+
+              <input
+                id="payoutReturnRate"
+                type="number"
+                min="-10"
+                max="25"
+                step="0.1"
+                value="4"
+              >
+
+              <span aria-hidden="true">%</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="two-column-fields">
+
+          <div class="field">
+
+            <label for="payoutTaxRate">
+              Tax on payouts
+            </label>
+
+            <div class="percent-input">
+
+              <input
+                id="payoutTaxRate"
+                type="number"
+                min="0"
+                max="60"
+                step="0.1"
+                value="22"
+              >
+
+              <span aria-hidden="true">%</span>
+
+            </div>
+
+          </div>
+
+          <div class="field">
+
+            <label for="installmentGrowthRate">
+              Installment increase
+            </label>
+
+            <div class="percent-input">
+
+              <input
+                id="installmentGrowthRate"
+                type="number"
+                min="0"
+                max="20"
+                step="0.1"
+                value="5"
+              >
+
+              <span aria-hidden="true">%</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <button
+      type="button"
+      class="button button-primary calculate-button"
+      id="calculateButton"
+    >
+      Calculate my net picture
+    </button>
+
+    <p class="auto-update-note">
+      Results also update automatically as you change assumptions.
+    </p>
+
+  </aside>
+
+  <!-- =======================================================
+       MAIN RESULTS AREA
+  ======================================================== -->
+
+  <main class="results-panel">
+
+    <!-- PRIMARY KPIs -->
+
+    <section class="kpi-grid">
+
+      <article class="kpi-card">
+
+        <div class="kpi-label">
+          Net available to invest
+        </div>
+
+        <div class="kpi-value positive" id="netInvestableValue">
+          $0
+        </div>
+
+        <div class="kpi-caption" id="netInvestableCaption">
+          After estimated upfront taxes
+        </div>
+
+      </article>
+
+      <article class="kpi-card">
+
+        <div class="kpi-label">
+          Ending portfolio
+        </div>
+
+        <div class="kpi-value accent" id="endingPortfolioValue">
+          $0
+        </div>
+
+        <div class="kpi-caption" id="endingPortfolioCaption">
+          Before final liquidation taxes
+        </div>
+
+      </article>
+
+      <article class="kpi-card">
+
+        <div class="kpi-label">
+          Net liquidation value
+        </div>
+
+        <div class="kpi-value positive" id="netLiquidationValue">
+          $0
+        </div>
+
+        <div class="kpi-caption" id="netLiquidationCaption">
+          Estimated spendable value
+        </div>
+
+      </article>
+
+      <article class="kpi-card">
+
+        <div class="kpi-label">
+          Value in today’s dollars
+        </div>
+
+        <div class="kpi-value warning" id="realValue">
+          $0
+        </div>
+
+        <div class="kpi-caption" id="realValueCaption">
+          Inflation-adjusted purchasing power
+        </div>
+
+      </article>
+
+    </section>
+
+    <!-- RESULT NAVIGATION -->
+
+    <nav
+      class="result-tabs"
+      aria-label="WealthScope result sections"
+    >
+
+      <button
+        type="button"
+        class="result-tab active"
+        data-view="overviewView"
+        aria-selected="true"
+      >
+        Overview
+      </button>
+
+      <button
+        type="button"
+        class="result-tab"
+        data-view="allocationView"
+        aria-selected="false"
+      >
+        Allocation
+      </button>
+
+      <button
+        type="button"
+        class="result-tab"
+        data-view="taxView"
+        aria-selected="false"
+      >
+        Taxes
+      </button>
+
+      <button
+        type="button"
+        class="result-tab"
+        data-view="incomeView"
+        aria-selected="false"
+      >
+        Income
+      </button>
+
+      <button
+        type="button"
+        class="result-tab"
+        data-view="growthView"
+        aria-selected="false"
+      >
+        Growth
+      </button>
+
+      <button
+        type="button"
+        class="result-tab"
+        data-view="annuityView"
+        aria-selected="false"
+      >
+        Lump sum vs. annuity
+      </button>
+
+      <button
+        type="button"
+        class="result-tab"
+        data-view="scheduleView"
+        aria-selected="false"
+      >
+        Schedule
+      </button>
+
+    </nav>
+
+    <!-- =====================================================
+         OVERVIEW VIEW
+    ====================================================== -->
+
+    <section
+      class="result-view active"
+      id="overviewView"
+    >
+
+      <div class="dashboard-grid">
+
+        <article class="result-card chart-card span-two">
+
+          <div class="card-heading">
+
+            <div>
+
+              <div class="card-kicker">
+                Total wealth
+              </div>
+
+              <h2>
+                Portfolio growth
+              </h2>
+
+            </div>
+
+            <div class="chart-legend">
+
+              <span class="legend-item">
+                <i class="legend-dot portfolio-dot"></i>
+                Gross portfolio
+              </span>
+
+              <span class="legend-item">
+                <i class="legend-dot net-dot"></i>
+                Net liquidation
+              </span>
+
+              <span class="legend-item">
+                <i class="legend-dot real-dot"></i>
+                Today’s dollars
+              </span>
+
+            </div>
+
+          </div>
+
+          <div class="chart-container large-chart">
+
+            <canvas
+              id="overviewGrowthChart"
+              aria-label="Portfolio growth chart"
+            ></canvas>
+
+          </div>
+
+        </article>
+
+        <article class="result-card">
+
+          <div class="card-kicker">
+            First-year income
+          </div>
+
+          <h2>
+            What the portfolio may pay
+          </h2>
+
+          <div class="large-result positive" id="firstYearNetIncome">
+            $0
+          </div>
+
+          <div class="large-result-label">
+            estimated net annual income
+          </div>
+
+          <div class="mini-stat-grid">
+
+            <div class="mini-stat">
+
+              <span>Gross monthly</span>
+
+              <strong id="grossMonthlyIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="mini-stat">
+
+              <span>Net monthly</span>
+
+              <strong id="netMonthlyIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="mini-stat">
+
+              <span>Portfolio yield</span>
+
+              <strong id="portfolioYield">
+                0%
+              </strong>
+
+            </div>
+
+            <div class="mini-stat">
+
+              <span>Income taxes</span>
+
+              <strong id="annualIncomeTax" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+          </div>
+
+        </article>
+
+        <article class="result-card">
+
+          <div class="card-kicker">
+            Money friction
+          </div>
+
+          <h2>
+            Where value is lost
+          </h2>
+
+          <div class="breakdown-list">
+
+            <div class="breakdown-row">
+
+              <span>Upfront taxes</span>
+
+              <strong id="overviewUpfrontTaxes" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Investment fees</span>
+
+              <strong id="overviewFees" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Taxes during growth</span>
+
+              <strong id="overviewTaxDrag" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Liquidation taxes</span>
+
+              <strong id="overviewLiquidationTax" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Inflation loss</span>
+
+              <strong id="overviewInflationLoss" class="warning">
+                $0
+              </strong>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- =====================================================
+         ALLOCATION VIEW
+    ====================================================== -->
+
+    <section
+      class="result-view"
+      id="allocationView"
+      hidden
+    >
+
+      <div class="dashboard-grid">
+
+        <article class="result-card allocation-chart-card">
+
+          <div class="card-heading">
+
+            <div>
+
+              <div class="card-kicker">
+                Portfolio mix
+              </div>
+
+              <h2>
+                Dynamic allocation
+              </h2>
+
+            </div>
+
+            <button
+              type="button"
+              class="button button-secondary button-small"
+              id="normalizeAllocationButton"
+            >
+              Normalize to 100%
+            </button>
+
+          </div>
+
+          <div class="allocation-total-line">
+
+            <span>
+              Allocated
+            </span>
+
+            <strong id="allocationPercentTotal">
+              100%
+            </strong>
+
+          </div>
+
+          <div class="chart-container allocation-chart">
+
+            <canvas
+              id="allocationPieChart"
+              aria-label="Investment allocation pie chart"
+            ></canvas>
+
+          </div>
+
+        </article>
+
+        <article class="result-card allocation-summary-card">
+
+          <div class="card-kicker">
+            Blended assumptions
+          </div>
+
+          <h2>
+            Portfolio characteristics
+          </h2>
+
+          <div class="mini-stat-grid">
+
+            <div class="mini-stat">
+
+              <span>Expected return</span>
+
+              <strong id="blendedReturn">
+                0%
+              </strong>
+
+            </div>
+
+            <div class="mini-stat">
+
+              <span>Gross income yield</span>
+
+              <strong id="blendedYield">
+                0%
+              </strong>
+
+            </div>
+
+            <div class="mini-stat">
+
+              <span>Expense ratio</span>
+
+              <strong id="blendedExpenseRatio">
+                0%
+              </strong>
+
+            </div>
+
+            <div class="mini-stat">
+
+              <span>Tax efficiency</span>
+
+              <strong id="taxEfficiencyScore">
+                —
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="allocation-income-summary">
+
+            <div>
+
+              <span>Gross annual yield</span>
+
+              <strong id="allocationGrossIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>Estimated taxes</span>
+
+              <strong id="allocationIncomeTax" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>Estimated fees</span>
+
+              <strong id="allocationFees" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>Net annual yield</span>
+
+              <strong id="allocationNetIncome" class="positive">
+                $0
+              </strong>
+
+            </div>
+
+          </div>
+
+        </article>
+
+        <article class="result-card span-two">
+
+          <div class="card-heading">
+
+            <div>
+
+              <div class="card-kicker">
+                Editable portfolio
+              </div>
+
+              <h2>
+                Allocation buckets
+              </h2>
+
+            </div>
+
+            <button
+              type="button"
+              class="button button-primary button-small"
+              id="addCustomAssetButton"
+            >
+              Add custom asset
+            </button>
+
+          </div>
+
+          <div class="table-scroll">
+
+            <table class="data-table allocation-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>Asset</th>
+                  <th>Allocation</th>
+                  <th>Dollars</th>
+                  <th>Total return</th>
+                  <th>Income yield</th>
+                  <th>Fee</th>
+                  <th>Gross income</th>
+                  <th>Income tax</th>
+                  <th>Net income</th>
+                  <th></th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="allocationTableBody">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- =====================================================
+         TAX VIEW
+    ====================================================== -->
+
+    <section
+      class="result-view"
+      id="taxView"
+      hidden
+    >
+
+      <div class="tax-kpi-grid">
+
+        <article class="tax-kpi">
+
+          <span>Federal tax</span>
+
+          <strong id="federalUpfrontTax">
+            $0
+          </strong>
+
+          <small id="federalEffectiveRate">
+            0% effective
+          </small>
+
+        </article>
+
+        <article class="tax-kpi">
+
+          <span>State tax</span>
+
+          <strong id="stateUpfrontTax">
+            $0
+          </strong>
+
+          <small id="stateEffectiveRate">
+            0% effective
+          </small>
+
+        </article>
+
+        <article class="tax-kpi">
+
+          <span>Local tax</span>
+
+          <strong id="localUpfrontTax">
+            $0
+          </strong>
+
+          <small id="localEffectiveRate">
+            0% effective
+          </small>
+
+        </article>
+
+        <article class="tax-kpi">
+
+          <span>Net investment tax</span>
+
+          <strong id="niitTax">
+            $0
+          </strong>
+
+          <small>
+            High-income investment surtax
+          </small>
+
+        </article>
+
+        <article class="tax-kpi">
+
+          <span>Total upfront tax</span>
+
+          <strong id="totalUpfrontTax" class="negative">
+            $0
+          </strong>
+
+          <small id="totalEffectiveTaxRate">
+            0% effective
+          </small>
+
+        </article>
+
+      </div>
+
+      <div class="dashboard-grid">
+
+        <article class="result-card">
+
+          <div class="card-kicker">
+            Federal
+          </div>
+
+          <h2>
+            Progressive bracket calculation
+          </h2>
+
+          <div class="breakdown-list">
+
+            <div class="breakdown-row">
+
+              <span>Gross taxable income</span>
+
+              <strong id="federalGrossIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Deduction used</span>
+
+              <strong id="federalDeductionUsed">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Taxable income</span>
+
+              <strong id="federalTaxableIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Marginal rate</span>
+
+              <strong id="federalMarginalRate">
+                0%
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Effective rate</span>
+
+              <strong id="federalAverageRate">
+                0%
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="table-scroll compact-table-scroll">
+
+            <table class="data-table">
+
+              <thead>
+
+                <tr>
+                  <th>Bracket</th>
+                  <th>Taxed amount</th>
+                  <th>Rate</th>
+                  <th>Tax</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="federalBracketTableBody">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </article>
+
+        <article class="result-card">
+
+          <div class="card-kicker">
+            State
+          </div>
+
+          <h2 id="stateTaxHeading">
+            State tax details
+          </h2>
+
+          <div class="state-rule-badges" id="stateRuleBadges">
+          </div>
+
+          <div class="breakdown-list">
+
+            <div class="breakdown-row">
+
+              <span>Tax method</span>
+
+              <strong id="stateTaxMethod">
+                —
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>State deduction</span>
+
+              <strong id="stateDeduction">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>State taxable income</span>
+
+              <strong id="stateTaxableIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Capital-gain treatment</span>
+
+              <strong id="stateCapitalGainTreatment">
+                —
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Estimated state tax</span>
+
+              <strong id="stateTaxTotal" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+          </div>
+
+          <div class="state-explanation" id="stateExplanation">
+            Select a state to view its modeled tax treatment.
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- =====================================================
+         INCOME VIEW
+    ====================================================== -->
+
+    <section
+      class="result-view"
+      id="incomeView"
+      hidden
+    >
+
+      <div class="dashboard-grid">
+
+        <article class="result-card span-two">
+
+          <div class="card-heading">
+
+            <div>
+
+              <div class="card-kicker">
+                Portfolio income
+              </div>
+
+              <h2>
+                Gross versus net yield
+              </h2>
+
+            </div>
+
+          </div>
+
+          <div class="chart-container large-chart">
+
+            <canvas
+              id="incomeChart"
+              aria-label="Gross and net portfolio income chart"
+            ></canvas>
+
+          </div>
+
+        </article>
+
+        <article class="result-card">
+
+          <div class="card-kicker">
+            Annual income
+          </div>
+
+          <h2>
+            Portfolio distributions
+          </h2>
+
+          <div class="breakdown-list">
+
+            <div class="breakdown-row">
+
+              <span>Interest</span>
+
+              <strong id="annualInterestIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Qualified dividends</span>
+
+              <strong id="annualQualifiedDividends">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Ordinary dividends</span>
+
+              <strong id="annualOrdinaryDividends">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>REIT distributions</span>
+
+              <strong id="annualReitIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Total gross income</span>
+
+              <strong id="annualGrossPortfolioIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Total net income</span>
+
+              <strong id="annualNetPortfolioIncome" class="positive">
+                $0
+              </strong>
+
+            </div>
+
+          </div>
+
+        </article>
+
+        <article class="result-card">
+
+          <div class="card-kicker">
+            Monthly income
+          </div>
+
+          <h2>
+            What may reach your pocket
+          </h2>
+
+          <div class="large-result positive" id="incomeViewNetMonthly">
+            $0
+          </div>
+
+          <div class="large-result-label">
+            estimated net per month
+          </div>
+
+          <div class="goal-progress">
+
+            <div class="goal-progress-label">
+
+              <span>
+                Monthly goal coverage
+              </span>
+
+              <strong id="monthlyGoalCoverage">
+                0%
+              </strong>
+
+            </div>
+
+            <div class="progress-track">
+
+              <div
+                class="progress-fill"
+                id="monthlyGoalProgressBar"
+                style="width:0%"
+              ></div>
+
+            </div>
+
+          </div>
+
+          <div class="breakdown-list">
+
+            <div class="breakdown-row">
+
+              <span>Gross monthly</span>
+
+              <strong id="incomeViewGrossMonthly">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Monthly income tax</span>
+
+              <strong id="incomeViewMonthlyTax" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Monthly fees</span>
+
+              <strong id="incomeViewMonthlyFees" class="negative">
+                $0
+              </strong>
+
+            </div>
+
+          </div>
+
+        </article>
+
+        <article class="result-card span-two">
+
+          <div class="card-kicker">
+            Income by allocation
+          </div>
+
+          <h2>
+            What each slice produces
+          </h2>
+
+          <div class="table-scroll">
+
+            <table class="data-table">
+
+              <thead>
+
+                <tr>
+                  <th>Asset</th>
+                  <th>Allocated</th>
+                  <th>Gross annual</th>
+                  <th>Estimated tax</th>
+                  <th>Fees</th>
+                  <th>Net annual</th>
+                  <th>Net monthly</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="incomeByAssetTableBody">
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- =====================================================
+         GROWTH VIEW
+    ====================================================== -->
+
+    <section
+      class="result-view"
+      id="growthView"
+      hidden
+    >
+
+      <div class="scenario-card-grid">
+
+        <article class="scenario-card">
+
+          <div class="scenario-label">
+            Conservative
+          </div>
+
+          <div class="scenario-rate">
+            4.5%
+          </div>
+
+          <strong id="conservativeEndingValue">
+            $0
+          </strong>
+
+          <span id="conservativeRealValue">
+            $0 in today’s dollars
+          </span>
+
+        </article>
+
+        <article class="scenario-card featured">
+
+          <div class="scenario-label">
+            Planning case
+          </div>
+
+          <div class="scenario-rate">
+            8%
+          </div>
+
+          <strong id="planningEndingValue">
+            $0
+          </strong>
+
+          <span id="planningRealValue">
+            $0 in today’s dollars
+          </span>
+
+        </article>
+
+        <article class="scenario-card speculative">
+
+          <div class="scenario-label">
+            Highly speculative
+          </div>
+
+          <div class="scenario-rate">
+            15%
+          </div>
+
+          <strong id="speculativeEndingValue">
+            $0
+          </strong>
+
+          <span id="speculativeRealValue">
+            $0 in today’s dollars
+          </span>
+
+        </article>
+
+      </div>
+
+      <article class="result-card chart-card">
+
+        <div class="card-heading">
+
+          <div>
+
+            <div class="card-kicker">
+              Scenario comparison
+            </div>
+
+            <h2>
+              How return assumptions change the outcome
+            </h2>
+
+          </div>
+
+        </div>
+
+        <div class="chart-container large-chart">
+
+          <canvas
+            id="scenarioGrowthChart"
+            aria-label="Return scenario comparison chart"
+          ></canvas>
+
+        </div>
+
+      </article>
+
+    </section>
+
+    <!-- =====================================================
+         ANNUITY VIEW
+    ====================================================== -->
+
+    <section
+      class="result-view"
+      id="annuityView"
+      hidden
+    >
+
+      <div class="comparison-grid">
+
+        <article class="comparison-card">
+
+          <div class="comparison-kicker">
+            Option A
+          </div>
+
+          <h2>
+            Lump sum invested
+          </h2>
+
+          <div class="comparison-value positive" id="lumpSumNetStart">
+            $0
+          </div>
+
+          <div class="breakdown-list">
+
+            <div class="breakdown-row">
+
+              <span>Net amount invested</span>
+
+              <strong id="lumpSumInvested">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Projected ending value</span>
+
+              <strong id="lumpSumEndingValue">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Estimated annual income</span>
+
+              <strong id="lumpSumAnnualIncome">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Estimated net monthly</span>
+
+              <strong id="lumpSumMonthlyIncome">
+                $0
+              </strong>
+
+            </div>
+
+          </div>
+
+        </article>
+
+        <article class="comparison-card">
+
+          <div class="comparison-kicker">
+            Option B
+          </div>
+
+          <h2>
+            Installment or annuity
+          </h2>
+
+          <div class="comparison-value accent" id="annuityFirstPayment">
+            $0
+          </div>
+
+          <div class="breakdown-list">
+
+            <div class="breakdown-row">
+
+              <span>First annual payment</span>
+
+              <strong id="annuityFirstAnnualPayment">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>First net monthly payment</span>
+
+              <strong id="annuityFirstMonthlyPayment">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Final annual payment</span>
+
+              <strong id="annuityFinalAnnualPayment">
+                $0
+              </strong>
+
+            </div>
+
+            <div class="breakdown-row">
+
+              <span>Total estimated net payout</span>
+
+              <strong id="annuityTotalNetPayout">
+                $0
+              </strong>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      </div>
+
+      <article class="result-card chart-card">
+
+        <div class="card-heading">
+
+          <div>
+
+            <div class="card-kicker">
+              Payment timeline
+            </div>
+
+            <h2>
+              Lump-sum withdrawals versus installments
+            </h2>
+
+          </div>
+
+        </div>
+
+        <div class="chart-container large-chart">
+
+          <canvas
+            id="annuityComparisonChart"
+            aria-label="Lump sum and annuity comparison chart"
+          ></canvas>
+
+        </div>
+
+      </article>
+
+    </section>
+
+    <!-- =====================================================
+         SCHEDULE VIEW
+    ====================================================== -->
+
+    <section
+      class="result-view"
+      id="scheduleView"
+      hidden
+    >
+
+      <article class="result-card">
+
+        <div class="card-heading">
+
+          <div>
+
+            <div class="card-kicker">
+              Detailed projection
+            </div>
+
+            <h2>
+              Year-by-year schedule
+            </h2>
+
+          </div>
+
+          <button
+            type="button"
+            class="button button-secondary button-small"
+            id="downloadCsvButton"
+          >
+            Download CSV
+          </button>
+
+        </div>
+
+        <div class="table-scroll schedule-scroll">
+
+          <table class="data-table schedule-table">
+
+            <thead>
+
+              <tr>
+                <th>Year</th>
+                <th>Starting balance</th>
+                <th>Contributions</th>
+                <th>Gross growth</th>
+                <th>Income</th>
+                <th>Fees</th>
+                <th>Tax drag</th>
+                <th>Ending balance</th>
+                <th>Cost basis</th>
+                <th>Liquidation tax</th>
+                <th>Net value</th>
+                <th>Today’s dollars</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="annualScheduleTableBody">
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </article>
+
+    </section>
+
+    <!-- =====================================================
+         DISCLAIMER
+    ====================================================== -->
+
+    <footer class="disclaimer-card">
+
+      <strong>
+        Educational planning estimate only.
+      </strong>
+
+      WealthScope is not tax, legal, investment, accounting or insurance
+      advice. Tax results may differ because of deductions, credits,
+      exemptions, alternative minimum tax, Net Investment Income Tax,
+      local rules, tax-loss harvesting, contribution limits, penalties,
+      changing laws and individual circumstances. Investment returns and
+      yields are assumptions, not guarantees.
+
+    </footer>
+
+  </main>
+
+</div>
+```
+
+  </div>
+
+  <!-- =========================================================
+       SAVE-SCENARIO DIALOG
+  ========================================================== -->
+
+  <dialog class="app-dialog" id="saveScenarioDialog">
+
+```
+<form method="dialog" id="saveScenarioForm">
+
+  <div class="dialog-heading">
+
+    <div>
+
+      <div class="card-kicker">
+        Save locally
+      </div>
+
+      <h2>
+        Name this scenario
+      </h2>
+
+    </div>
+
+    <button
+      type="submit"
+      class="dialog-close"
+      value="cancel"
+      aria-label="Close dialog"
+    >
+      ×
+    </button>
+
+  </div>
+
+  <div class="field">
+
+    <label for="scenarioName">
+      Scenario name
+    </label>
+
+    <input
+      id="scenarioName"
+      type="text"
+      maxlength="60"
+      placeholder="Example: $500K balanced plan"
+      required
+    >
+
+  </div>
+
+  <div class="dialog-actions">
+
+    <button
+      type="submit"
+      class="button button-secondary"
+      value="cancel"
+    >
+      Cancel
+    </button>
+
+    <button
+      type="button"
+      class="button button-primary"
+      id="confirmSaveScenarioButton"
+    >
+      Save scenario
+    </button>
+
+  </div>
+
+</form>
+```
+
+  </dialog>
+
+  <!-- =========================================================
+       LOAD-SCENARIO DIALOG
+  ========================================================== -->
+
+  <dialog class="app-dialog" id="loadScenarioDialog">
+
+```
+<div class="dialog-heading">
+
+  <div>
+
+    <div class="card-kicker">
+      Saved scenarios
+    </div>
+
+    <h2>
+      Load a previous plan
+    </h2>
+
+  </div>
+
+  <button
+    type="button"
+    class="dialog-close"
+    id="closeLoadScenarioDialogButton"
+    aria-label="Close dialog"
+  >
+    ×
+  </button>
+
 </div>
 
-<div>
-<label>Local tax %</label>
-<input id="localRate" type="number" value="0" step=".01">
+<div class="saved-scenario-list" id="savedScenarioList">
 </div>
+```
 
-</div>
+  </dialog>
 
-</div>
+  <!-- =========================================================
+       CUSTOM ASSET DIALOG
+  ========================================================== -->
 
-<div class="section">
+  <dialog class="app-dialog" id="customAssetDialog">
 
-<h3>Investment</h3>
+```
+<form method="dialog" id="customAssetForm">
 
-<div class="row">
+  <div class="dialog-heading">
 
-<div>
-<label>Years</label>
-<input id="years" type="number" value="30" min="1" max="100">
-</div>
+    <div>
 
-<div>
-<label>Annual return %</label>
-<input id="returnRate" type="number" value="7" step=".1">
-</div>
+      <div class="card-kicker">
+        Custom allocation
+      </div>
 
-</div>
+      <h2>
+        Add an investment bucket
+      </h2>
 
-<div class="row">
+    </div>
 
-<div>
-<label>Contribution amount</label>
-<input id="contribution" type="number" value="0" min="0">
-</div>
+    <button
+      type="submit"
+      class="dialog-close"
+      value="cancel"
+      aria-label="Close dialog"
+    >
+      ×
+    </button>
 
-<div>
-<label>Frequency</label>
+  </div>
 
-<select id="frequency">
-  <option value="12">Monthly</option>
-  <option value="26">Biweekly</option>
-  <option value="52">Weekly</option>
-  <option value="4">Quarterly</option>
-  <option value="1">Annually</option>
-</select>
-</div>
+  <div class="field">
 
-</div>
+    <label for="customAssetName">
+      Asset name
+    </label>
 
-<div class="row">
+    <input
+      id="customAssetName"
+      type="text"
+      maxlength="40"
+      placeholder="Example: Private lending"
+      required
+    >
 
-<div>
-<label>Annual fee %</label>
-<input id="feeRate" type="number" value=".25" step=".01">
-</div>
+  </div>
 
-<div>
-<label>Inflation %</label>
-<input id="inflation" type="number" value="3" step=".1">
-</div>
+  <div class="two-column-fields">
 
-</div>
+    <div class="field">
 
-<label>Account type</label>
+      <label for="customAssetAllocation">
+        Allocation
+      </label>
 
-<select id="accountType">
-  <option value="taxable">Taxable brokerage</option>
-  <option value="deferred">Traditional / tax-deferred</option>
-  <option value="roth">Roth / tax-free qualified</option>
-  <option value="cash">Cash / savings</option>
-</select>
+      <div class="percent-input">
 
-<div class="row">
+        <input
+          id="customAssetAllocation"
+          type="number"
+          min="0"
+          max="100"
+          step="0.1"
+          value="0"
+        >
 
-<div>
-<label>Taxable yield %</label>
-<input id="yieldRate" type="number" value="2" step=".1">
-</div>
+        <span aria-hidden="true">%</span>
 
-<div>
-<label>Tax rate on yield %</label>
-<input id="yieldTax" type="number" value="15" step=".1">
-</div>
+      </div>
 
-</div>
+    </div>
 
-<div class="row">
+    <div class="field">
 
-<div>
-<label>Annual gains realized %</label>
-<input id="realizedPct" type="number" value="10">
-</div>
+      <label for="customAssetReturn">
+        Total return
+      </label>
 
-<div>
-<label>Deferred withdrawal tax %</label>
-<input id="deferredTax" type="number" value="22" step=".1">
-</div>
+      <div class="percent-input">
 
-</div>
+        <input
+          id="customAssetReturn"
+          type="number"
+          min="-100"
+          max="100"
+          step="0.1"
+          value="6"
+        >
 
-</div>
+        <span aria-hidden="true">%</span>
 
-<div class="section">
+      </div>
 
-<h3>Income / annuity</h3>
+    </div>
 
-<label>Mode</label>
+  </div>
 
-<select id="incomeMode">
-  <option value="withdraw">Portfolio withdrawal</option>
-  <option value="fixed">Fixed-period annuity</option>
-  <option value="lottery">Growing lottery installments</option>
-  <option value="preserve">
-    Spend estimated return, preserve nominal principal
-  </option>
-</select>
+  <div class="two-column-fields">
 
-<div class="row">
+    <div class="field">
 
-<div>
-<label>Withdrawal %</label>
-<input id="withdrawRate" type="number" value="4" step=".1">
-</div>
+      <label for="customAssetYield">
+        Income yield
+      </label>
 
-<div>
-<label>Payout tax %</label>
-<input id="payoutTax" type="number" value="22" step=".1">
-</div>
+      <div class="percent-input">
 
-</div>
+        <input
+          id="customAssetYield"
+          type="number"
+          min="0"
+          max="100"
+          step="0.1"
+          value="4"
+        >
 
-<div class="row">
+        <span aria-hidden="true">%</span>
 
-<div>
-<label>Payout years</label>
-<input id="payoutYears" type="number" value="30">
-</div>
+      </div>
 
-<div>
-<label>Payout return %</label>
-<input id="payoutReturn" type="number" value="4" step=".1">
-</div>
+    </div>
 
-</div>
+    <div class="field">
 
-<label>Lottery payment growth %</label>
-<input id="lotteryGrowth" type="number" value="5" step=".1">
+      <label for="customAssetFee">
+        Annual fee
+      </label>
 
-</div>
+      <div class="percent-input">
 
-<button id="calculate" class="go">
-Calculate
-</button>
+        <input
+          id="customAssetFee"
+          type="number"
+          min="0"
+          max="20"
+          step="0.01"
+          value="0"
+        >
 
-</aside>
+        <span aria-hidden="true">%</span>
 
-<main class="main">
+      </div>
 
-<div class="cards">
+    </div>
 
-<div class="panel card">
-<div class="k">Net available</div>
-<div id="netStart" class="v good">$0</div>
-</div>
+  </div>
 
-<div class="panel card">
-<div class="k">Ending portfolio</div>
-<div id="ending" class="v blue">$0</div>
-</div>
+  <div class="field">
 
-<div class="panel card">
-<div class="k">Net liquidation</div>
-<div id="liquid" class="v good">$0</div>
-</div>
+    <label for="customAssetTaxType">
+      Primary income tax treatment
+    </label>
 
-<div class="panel card">
-<div class="k">Today's dollars</div>
-<div id="real" class="v gold">$0</div>
-</div>
+    <select id="customAssetTaxType">
 
-</div>
+      <option value="ordinary">
+        Ordinary income
+      </option>
 
-<div class="split">
+      <option value="qualifiedDividend">
+        Qualified dividend
+      </option>
 
-<div class="panel box">
+      <option value="capitalGain">
+        Long-term capital gain
+      </option>
 
-<h2>Breakdown</h2>
+      <option value="stateExemptInterest">
+        Federally taxable, state-exempt interest
+      </option>
 
-<div class="metric">
-<span>Federal upfront tax</span>
-<strong id="fed" class="bad">$0</strong>
-</div>
+      <option value="federalExemptInterest">
+        Federally exempt municipal interest
+      </option>
 
-<div class="metric">
-<span>State upfront tax</span>
-<strong id="stateTax" class="bad">$0</strong>
-</div>
+      <option value="taxFree">
+        Tax-free
+      </option>
 
-<div class="metric">
-<span>Local upfront tax</span>
-<strong id="localTax" class="bad">$0</strong>
-</div>
+    </select>
 
-<div class="metric">
-<span>Total contributions</span>
-<strong id="contribOut">$0</strong>
-</div>
+  </div>
 
-<div class="metric">
-<span>Gross growth</span>
-<strong id="growthOut" class="good">$0</strong>
-</div>
+  <div class="dialog-actions">
 
-<div class="metric">
-<span>Fees</span>
-<strong id="feesOut" class="bad">$0</strong>
-</div>
+    <button
+      type="submit"
+      class="button button-secondary"
+      value="cancel"
+    >
+      Cancel
+    </button>
 
-<div class="metric">
-<span>Taxes during growth</span>
-<strong id="dragOut" class="bad">$0</strong>
-</div>
+    <button
+      type="button"
+      class="button button-primary"
+      id="confirmAddCustomAssetButton"
+    >
+      Add asset
+    </button>
 
-<div class="metric">
-<span>Liquidation tax</span>
-<strong id="liqTax" class="bad">$0</strong>
-</div>
+  </div>
 
-</div>
+</form>
+```
 
-<div class="panel box">
-
-<h2>Income / annuity</h2>
-
-<div class="metric">
-<span>Gross first-year income</span>
-<strong id="annualIncome">$0</strong>
-</div>
-
-<div class="metric">
-<span>Net monthly income</span>
-<strong id="monthlyIncome" class="good">$0</strong>
-</div>
-
-<div class="metric">
-<span>Total net payout</span>
-<strong id="totalPayout">$0</strong>
-</div>
-
-<p id="incomeNote" class="sub"></p>
-
-</div>
-
-</div>
-
-<div class="panel box">
-
-<h2>Return scenarios</h2>
-
-<div class="scenario">
-
-<div>
-<span class="k">Conservative 4.5%</span>
-<strong id="s45">$0</strong>
-</div>
-
-<div>
-<span class="k">Planning 8%</span>
-<strong id="s8" class="good">$0</strong>
-</div>
-
-<div>
-<span class="k">Speculative 15%</span>
-<strong id="s15" class="bad">$0</strong>
-</div>
-
-</div>
-
-</div>
-
-<div class="panel box">
-
-<h2>Year-by-year schedule</h2>
-
-<div class="tablewrap">
-
-<table>
-
-<thead>
-<tr>
-  <th>Year</th>
-  <th>Start</th>
-  <th>Contributions</th>
-  <th>Growth</th>
-  <th>Fees</th>
-  <th>Growth taxes</th>
-  <th>End</th>
-  <th>Cost basis</th>
-  <th>Liquidation tax</th>
-  <th>Net</th>
-  <th>Today's $</th>
-</tr>
-</thead>
-
-<tbody id="rows"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-<div class="panel note">
-
-<strong>Educational estimate only.</strong>
-
-Federal and state calculations are simplified planning estimates
-and may not reflect deductions, credits, local rules, NIIT,
-penalties, or your complete tax situation.
-
-High investment returns are not guaranteed.
-
-</div>
-
-</main>
-
-</div>
-
-</div>
-
-<script>
-"use strict";
-
-const $ = id => document.getElementById(id);
-
-const M = number =>
-  new Intl.NumberFormat(
-    "en-US",
-    {
-      style:"currency",
-      currency:"USD",
-      maximumFractionDigits:0
-    }
-  ).format(
-    Number.isFinite(number) ? number : 0
-  );
-
-const N = id =>
-  Number($(id).value) || 0;
-
-const FED = {
-
-  single:{
-    d:16100,
-    b:[
-      [12400,.10],
-      [50400,.12],
-      [105700,.22],
-      [201775,.24],
-      [256225,.32],
-      [640600,.35],
-      [1e99,.37]
-    ],
-    cg:[49450,545500]
-  },
-
-  joint:{
-    d:32200,
-    b:[
-      [24800,.10],
-      [100800,.12],
-      [211400,.22],
-      [403550,.24],
-      [512450,.32],
-      [768700,.35],
-      [1e99,.37]
-    ],
-    cg:[98900,613700]
-  },
-
-  separate:{
-    d:16100,
-    b:[
-      [12400,.10],
-      [50400,.12],
-      [105700,.22],
-      [201775,.24],
-      [256225,.32],
-      [384350,.35],
-      [1e99,.37]
-    ],
-    cg:[49450,306850]
-  },
-
-  hoh:{
-    d:24150,
-    b:[
-      [17700,.10],
-      [67450,.12],
-      [107000,.22],
-      [204050,.24],
-      [256200,.32],
-      [640600,.35],
-      [1e99,.37]
-    ],
-    cg:[66200,579600]
-  }
-
-};
-
-const SR = {
-  AL:5,
-  AK:0,
-  AZ:2.5,
-  AR:3.9,
-  CA:13.3,
-  CO:4.4,
-  CT:6.99,
-  DE:6.6,
-  DC:10.75,
-  FL:0,
-  GA:4.99,
-  HI:11,
-  ID:5.3,
-  IL:4.95,
-  IN:2.95,
-  IA:3.8,
-  KS:5.58,
-  KY:4,
-  LA:3,
-  ME:7.15,
-  MD:5.75,
-  MA:5,
-  MI:4.25,
-  MN:9.85,
-  MS:4,
-  MO:4.7,
-  MT:5.9,
-  NE:4.55,
-  NV:0,
-  NH:0,
-  NJ:10.75,
-  NM:5.9,
-  NY:10.9,
-  NC:3.99,
-  ND:2.5,
-  OH:2.75,
-  OK:4.5,
-  OR:9.9,
-  PA:3.07,
-  RI:5.99,
-  SC:6.2,
-  SD:0,
-  TN:0,
-  TX:0,
-  UT:4.5,
-  VT:8.75,
-  VA:5.75,
-  WA:0,
-  WV:4.82,
-  WI:7.65,
-  WY:0
-};
-
-function taxOrd(taxable, brackets){
-
-  taxable = Math.max(0,taxable);
-
-  let tax = 0;
-  let previous = 0;
-
-  for(const [ceiling,rate] of brackets){
-
-    if(taxable <= previous){
-      break;
-    }
-
-    tax += (
-      Math.min(taxable,ceiling) - previous
-    ) * rate;
-
-    previous = ceiling;
-
-  }
-
-  return Math.max(0,tax);
-
-}
-
-function taxCG(gain,ordinaryIncome,filing){
-
-  gain = Math.max(0,gain);
-
-  const [zeroTop,fifteenTop] =
-    FED[filing].cg;
-
-  const zeroRoom =
-    Math.max(
-      0,
-      zeroTop - ordinaryIncome
-    );
-
-  const taxedAtZero =
-    Math.min(
-      gain,
-      zeroRoom
-    );
-
-  const remaining =
-    gain - taxedAtZero;
-
-  const fifteenRoom =
-    Math.max(
-      0,
-      fifteenTop -
-      Math.max(
-        ordinaryIncome,
-        zeroTop
-      )
-    );
-
-  const taxedAtFifteen =
-    Math.min(
-      remaining,
-      fifteenRoom
-    );
-
-  const taxedAtTwenty =
-    Math.max(
-      0,
-      remaining - taxedAtFifteen
-    );
-
-  return (
-    taxedAtFifteen * .15 +
-    taxedAtTwenty * .20
-  );
-
-}
-
-function upfront(
-  amount,
-  type,
-  otherIncome,
-  filing,
-  stateRate,
-  localRate
-){
-
-  const baseTaxable =
-    Math.max(
-      0,
-      otherIncome -
-      FED[filing].d
-    );
-
-  let federal = 0;
-
-  if(
-    [
-      "ordinary",
-      "lottery",
-      "short"
-    ].includes(type)
-  ){
-
-    federal =
-      taxOrd(
-        Math.max(
-          0,
-          otherIncome +
-          amount -
-          FED[filing].d
-        ),
-        FED[filing].b
-      )
-      -
-      taxOrd(
-        baseTaxable,
-        FED[filing].b
-      );
-
-  }
-
-  if(type === "long"){
-
-    federal =
-      taxCG(
-        amount,
-        baseTaxable,
-        filing
-      );
-
-  }
-
-  const taxableAmount =
-    [
-      "after",
-      "inheritance"
-    ].includes(type)
-      ? 0
-      : amount;
-
-  return {
-    federal,
-    state:taxableAmount * stateRate,
-    local:taxableAmount * localRate
-  };
-
-}
-
-function project(
-  initial,
-  annualReturn,
-  years,
-  contribution,
-  frequency,
-  feeRate,
-  inflation,
-  accountType,
-  yieldRate,
-  yieldTax,
-  realizedPercent,
-  deferredTax,
-  filing,
-  otherIncome
-){
-
-  const months =
-    years * 12;
-
-  const monthlyReturn =
-    Math.pow(
-      1 + annualReturn,
-      1 / 12
-    ) - 1;
-
-  const monthlyFee =
-    feeRate / 12;
-
-  const monthlyContribution =
-    contribution *
-    frequency /
-    12;
-
-  const ordinaryTaxable =
-    Math.max(
-      0,
-      otherIncome -
-      FED[filing].d
-    );
-
-  let balance = initial;
-  let costBasis = initial;
-
-  let totalFees = 0;
-  let totalTaxDrag = 0;
-  let totalGrowth = 0;
-  let totalContributions = 0;
-
-  let yearlyStart = initial;
-  let yearlyContribution = 0;
-  let yearlyGrowth = 0;
-  let yearlyFees = 0;
-  let yearlyTaxes = 0;
-
-  const rows = [];
-
-  for(
-    let month = 1;
-    month <= months;
-    month++
-  ){
-
-    balance += monthlyContribution;
-    costBasis += monthlyContribution;
-
-    totalContributions +=
-      monthlyContribution;
-
-    yearlyContribution +=
-      monthlyContribution;
-
-    const growth =
-      balance * monthlyReturn;
-
-    totalGrowth += growth;
-    yearlyGrowth += growth;
-
-    const taxableDistribution =
-      accountType === "taxable"
-        ? balance *
-          yieldRate /
-          12
-        : 0;
-
-    const realizedGain =
-      accountType === "taxable"
-        ? Math.max(
-            0,
-            growth
-          ) *
-          realizedPercent
-        : 0;
-
-    const growthTax =
-      accountType === "taxable"
-        ? (
-          taxableDistribution *
-          yieldTax
-          +
-          taxCG(
-            realizedGain,
-            ordinaryTaxable,
-            filing
-          )
-        )
-        : 0;
-
-    const fee =
-      (
-        balance +
-        growth
-      ) *
-      monthlyFee;
-
-    balance =
-      Math.max(
-        0,
-        balance +
-        growth -
-        fee -
-        growthTax
-      );
-
-    if(accountType === "taxable"){
-
-      costBasis +=
-        Math.max(
-          0,
-          taxableDistribution -
-          growthTax
-        );
-
-    }
-
-    totalFees += fee;
-    totalTaxDrag += growthTax;
-
-    yearlyFees += fee;
-    yearlyTaxes += growthTax;
-
-    if(month % 12 === 0){
-
-      const unrealizedGain =
-        Math.max(
-          0,
-          balance -
-          costBasis
-        );
-
-      let liquidationTax = 0;
-
-      if(accountType === "taxable"){
-
-        liquidationTax =
-          taxCG(
-            unrealizedGain,
-            ordinaryTaxable,
-            filing
-          );
-
-      }
-
-      if(accountType === "deferred"){
-
-        liquidationTax =
-          balance *
-          deferredTax;
-
-      }
-
-      const netLiquidation =
-        Math.max(
-          0,
-          balance -
-          liquidationTax
-        );
-
-      const realValue =
-        netLiquidation /
-        Math.pow(
-          1 + inflation,
-          month / 12
-        );
-
-      rows.push({
-
-        year:month / 12,
-
-        start:yearlyStart,
-
-        contribution:
-          yearlyContribution,
-
-        growth:
-          yearlyGrowth,
-
-        fees:
-          yearlyFees,
-
-        taxes:
-          yearlyTaxes,
-
-        end:
-          balance,
-
-        basis:
-          costBasis,
-
-        liquidationTax,
-
-        net:
-          netLiquidation,
-
-        real:
-          realValue
-
-      });
-
-      yearlyStart =
-        balance;
-
-      yearlyContribution = 0;
-      yearlyGrowth = 0;
-      yearlyFees = 0;
-      yearlyTaxes = 0;
-
-    }
-
-  }
-
-  return {
-
-    rows,
-
-    balance,
-
-    totalFees,
-
-    totalTaxDrag,
-
-    totalGrowth,
-
-    totalContributions
-
-  };
-
-}
-
-function calculateIncome(principal){
-
-  const mode =
-    $("incomeMode").value;
-
-  const years =
-    Math.max(
-      1,
-      N("payoutYears")
-    );
-
-  const returnRate =
-    N("payoutReturn") /
-    100;
-
-  const payoutTax =
-    N("payoutTax") /
-    100;
-
-  const withdrawalRate =
-    N("withdrawRate") /
-    100;
-
-  const lotteryGrowth =
-    N("lotteryGrowth") /
-    100;
-
-  let annualPayment = 0;
-  let totalGross = 0;
-  let note = "";
-
-  if(mode === "withdraw"){
-
-    annualPayment =
-      principal *
-      withdrawalRate;
-
-    totalGross =
-      annualPayment *
-      years;
-
-    note =
-      `Withdraws ${M(annualPayment)} per year while the remaining portfolio is assumed to earn ${(returnRate * 100).toFixed(1)}%.`;
-
-  }
-
-  if(mode === "fixed"){
-
-    annualPayment =
-      returnRate === 0
-        ? principal / years
-        : principal *
-          (
-            returnRate *
-            Math.pow(
-              1 + returnRate,
-              years
-            )
-          )
-          /
-          (
-            Math.pow(
-              1 + returnRate,
-              years
-            ) - 1
-          );
-
-    totalGross =
-      annualPayment *
-      years;
-
-    note =
-      "Uses principal plus assumed earnings over the selected payout period.";
-
-  }
-
-  if(mode === "lottery"){
-
-    const weights =
-      Array.from(
-        {
-          length:years
-        },
-        (_,index) =>
-          Math.pow(
-            1 + lotteryGrowth,
-            index
-          )
-      );
-
-    const divisor =
-      weights.reduce(
-        (total,value) =>
-          total + value,
-        0
-      );
-
-    const firstPayment =
-      principal /
-      divisor;
-
-    annualPayment =
-      firstPayment;
-
-    totalGross =
-      principal;
-
-    const lastPayment =
-      firstPayment *
-      Math.pow(
-        1 + lotteryGrowth,
-        years - 1
-      );
-
-    note =
-      `Starts at ${M(firstPayment)} and grows ${(lotteryGrowth * 100).toFixed(1)}% per year. Final payment is about ${M(lastPayment)}.`;
-
-  }
-
-  if(mode === "preserve"){
-
-    annualPayment =
-      principal *
-      returnRate;
-
-    totalGross =
-      annualPayment *
-      years;
-
-    note =
-      "Illustrates spending the assumed return while leaving nominal principal unchanged.";
-
-  }
-
-  $("annualIncome").textContent =
-    M(annualPayment);
-
-  $("monthlyIncome").textContent =
-    M(
-      annualPayment *
-      (
-        1 - payoutTax
-      )
-      /
-      12
-    );
-
-  $("totalPayout").textContent =
-    M(
-      totalGross *
-      (
-        1 - payoutTax
-      )
-    );
-
-  $("incomeNote").textContent =
-    note;
-
-}
-
-function scenario(
-  initial,
-  rate,
-  years,
-  contribution,
-  frequency,
-  fee,
-  inflation
-){
-
-  const result =
-    project(
-      initial,
-      rate,
-      years,
-      contribution,
-      frequency,
-      fee,
-      inflation,
-      "roth",
-      0,
-      0,
-      0,
-      0,
-      "single",
-      0
-    );
-
-  return result.rows.at(-1).net;
-
-}
-
-function calculate(){
-
-  try{
-
-    $("error").style.display =
-      "none";
-
-    const start =
-      Math.max(
-        0,
-        N("start")
-      );
-
-    const type =
-      $("moneyType").value;
-
-    const filing =
-      $("filing").value;
-
-    const otherIncome =
-      Math.max(
-        0,
-        N("otherIncome")
-      );
-
-    const stateRate =
-      $("stateOverride").value === ""
-        ? (
-          SR[$("state").value] ||
-          0
-        )
-        /
-        100
-        : N("stateOverride") /
-          100;
-
-    const localRate =
-      N("localRate") /
-      100;
-
-    const taxes =
-      upfront(
-        start,
-        type,
-        otherIncome,
-        filing,
-        stateRate,
-        localRate
-      );
-
-    const netStart =
-      Math.max(
-        0,
-        start -
-        taxes.federal -
-        taxes.state -
-        taxes.local
-      );
-
-    const years =
-      Math.min(
-        100,
-        Math.max(
-          1,
-          N("years")
-        )
-      );
-
-    const returnRate =
-      N("returnRate") /
-      100;
-
-    const contribution =
-      Math.max(
-        0,
-        N("contribution")
-      );
-
-    const frequency =
-      N("frequency");
-
-    const feeRate =
-      N("feeRate") /
-      100;
-
-    const inflation =
-      N("inflation") /
-      100;
-
-    const result =
-      project(
-        netStart,
-        returnRate,
-        years,
-        contribution,
-        frequency,
-        feeRate,
-        inflation,
-        $("accountType").value,
-        N("yieldRate") / 100,
-        N("yieldTax") / 100,
-        N("realizedPct") / 100,
-        N("deferredTax") / 100,
-        filing,
-        otherIncome
-      );
-
-    const last =
-      result.rows.at(-1);
-
-    $("netStart").textContent =
-      M(netStart);
-
-    $("ending").textContent =
-      M(result.balance);
-
-    $("liquid").textContent =
-      M(last.net);
-
-    $("real").textContent =
-      M(last.real);
-
-    $("fed").textContent =
-      "−" +
-      M(taxes.federal);
-
-    $("stateTax").textContent =
-      "−" +
-      M(taxes.state);
-
-    $("localTax").textContent =
-      "−" +
-      M(taxes.local);
-
-    $("contribOut").textContent =
-      M(
-        result.totalContributions
-      );
-
-    $("growthOut").textContent =
-      M(
-        result.totalGrowth
-      );
-
-    $("feesOut").textContent =
-      "−" +
-      M(
-        result.totalFees
-      );
-
-    $("dragOut").textContent =
-      "−" +
-      M(
-        result.totalTaxDrag
-      );
-
-    $("liqTax").textContent =
-      "−" +
-      M(
-        last.liquidationTax
-      );
-
-    $("s45").textContent =
-      M(
-        scenario(
-          netStart,
-          .045,
-          years,
-          contribution,
-          frequency,
-          feeRate,
-          inflation
-        )
-      );
-
-    $("s8").textContent =
-      M(
-        scenario(
-          netStart,
-          .08,
-          years,
-          contribution,
-          frequency,
-          feeRate,
-          inflation
-        )
-      );
-
-    $("s15").textContent =
-      M(
-        scenario(
-          netStart,
-          .15,
-          years,
-          contribution,
-          frequency,
-          feeRate,
-          inflation
-        )
-      );
-
-    $("rows").innerHTML =
-      result.rows
-      .map(
-        row =>
-          `
-          <tr>
-            <td>${row.year}</td>
-            <td>${M(row.start)}</td>
-            <td>${M(row.contribution)}</td>
-            <td>${M(row.growth)}</td>
-            <td>${M(row.fees)}</td>
-            <td>${M(row.taxes)}</td>
-            <td>${M(row.end)}</td>
-            <td>${M(row.basis)}</td>
-            <td>${M(row.liquidationTax)}</td>
-            <td>${M(row.net)}</td>
-            <td>${M(row.real)}</td>
-          </tr>
-          `
-      )
-      .join("");
-
-    calculateIncome(
-      last.net
-    );
-
-  }catch(error){
-
-    $("error").textContent =
-      "Calculator error: " +
-      error.message;
-
-    $("error").style.display =
-      "block";
-
-    console.error(error);
-
-  }
-
-}
-
-document
-.querySelectorAll(
-  "input,select"
-)
-.forEach(
-  element =>
-    element.addEventListener(
-      "input",
-      calculate
-    )
-);
-
-$("calculate")
-.addEventListener(
-  "click",
-  calculate
-);
-
-calculate();
-</script>
+  </dialog>
 
 </body>
 </html>

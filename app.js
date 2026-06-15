@@ -229,11 +229,11 @@ maximumFractionDigits: 1
 function escapeHtml(value) {
 
 return String(value)
-.replaceAll("&", "&")
-.replaceAll("<", "<")
-.replaceAll(">", ">")
-.replaceAll('"', """)
-.replaceAll("'", "'");
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;")
+.replaceAll("'", "&#039;");
 
 }
 
@@ -340,11 +340,9 @@ missing.push(
 
 if (missing.length > 0) {
 
-```
 throw new Error(
   `Missing required data: ${missing.join(", ")}`
 );
-```
 
 }
 
@@ -394,7 +392,6 @@ stateOverrideElement.value
 
 return {
 
-```
 startingAmount:
   Math.max(
     0,
@@ -614,7 +611,6 @@ installmentGrowthRate:
     0,
     0.20
   )
-```
 
 };
 
@@ -636,11 +632,9 @@ filingStatus
 
 if (!status) {
 
-```
 throw new Error(
   `Unsupported filing status: ${filingStatus}`
 );
-```
 
 }
 
@@ -662,9 +656,7 @@ inputs.deductionMethod ===
 "none"
 ) {
 
-```
 return 0;
-```
 
 }
 
@@ -673,9 +665,7 @@ inputs.deductionMethod ===
 "itemized"
 ) {
 
-```
 return inputs.itemizedDeduction;
-```
 
 }
 
@@ -705,7 +695,6 @@ const bracket
 of brackets
 ) {
 
-```
 const minimum =
   bracket.minimum;
 
@@ -778,13 +767,11 @@ rows.push({
     bracketTax
 
 });
-```
 
 }
 
 return {
 
-```
 taxableIncome:
   safeIncome,
 
@@ -800,7 +787,6 @@ effectiveRate:
     : 0,
 
 rows
-```
 
 };
 
@@ -842,7 +828,6 @@ of status
 .longTermCapitalGainBrackets
 ) {
 
-```
 const minimum =
   bracket.minimum;
 
@@ -904,7 +889,6 @@ if (
 ) {
   break;
 }
-```
 
 }
 
@@ -912,7 +896,6 @@ if (
 remainingGain > 0
 ) {
 
-```
 const overflowTax =
   remainingGain
   *
@@ -941,13 +924,11 @@ rows.push({
     overflowTax
 
 });
-```
 
 }
 
 return {
 
-```
 gain,
 
 ordinaryTaxableIncome:
@@ -963,7 +944,6 @@ effectiveRate:
     : 0,
 
 rows
-```
 
 };
 
@@ -1008,7 +988,6 @@ excessIncome
 
 if (mode === "yes") {
 
-```
 return (
   Math.max(
     0,
@@ -1019,7 +998,6 @@ return (
   .netInvestmentIncomeTax
   .rate
 );
-```
 
 }
 
@@ -1093,7 +1071,6 @@ inputs.moneySource
 )
 ) {
 
-```
 taxType =
   "ordinaryIncome";
 
@@ -1124,7 +1101,6 @@ federalTax =
 
 windfallTaxableIncome =
   amount;
-```
 
 }
 
@@ -1133,7 +1109,6 @@ inputs.moneySource ===
 "longTermGain"
 ) {
 
-```
 taxType =
   "longTermCapitalGain";
 
@@ -1169,7 +1144,6 @@ niitTax =
 
 windfallTaxableIncome =
   amount;
-```
 
 }
 
@@ -1178,7 +1152,6 @@ inputs.moneySource ===
 "businessSale"
 ) {
 
-```
 taxType =
   "mixedBusinessSale";
 
@@ -1262,7 +1235,6 @@ niitTax =
 
 windfallTaxableIncome =
   amount;
-```
 
 }
 
@@ -1271,7 +1243,6 @@ inputs.moneySource ===
 "custom"
 ) {
 
-```
 taxType =
   "custom";
 
@@ -1283,7 +1254,6 @@ federalTax =
 
 windfallTaxableIncome =
   amount;
-```
 
 }
 
@@ -1297,7 +1267,6 @@ inputs.moneySource
 )
 ) {
 
-```
 taxType =
   "notTaxedUpfront";
 
@@ -1306,13 +1275,11 @@ federalTax = 0;
 niitTax = 0;
 
 windfallTaxableIncome = 0;
-```
 
 }
 
 return {
 
-```
 deduction,
 
 baseTaxableIncome,
@@ -1333,7 +1300,6 @@ totalFederalTax:
 taxType,
 
 capitalGainResult
-```
 
 };
 
@@ -1355,11 +1321,9 @@ stateCode
 
 if (!state) {
 
-```
 throw new Error(
   `Unknown state code: ${stateCode}`
 );
-```
 
 }
 
@@ -1381,9 +1345,7 @@ inputs.moneySource
 )
 ) {
 
-```
 return 0;
-```
 
 }
 
@@ -1421,16 +1383,13 @@ state.taxMethod ===
 "none"
 ) {
 
-```
 stateTax = 0;
-```
 
 } else if (
 state.taxMethod ===
 "limited"
 ) {
 
-```
 /*
   Washington-style special capital gain treatment
   is intentionally not guessed here.
@@ -1456,16 +1415,13 @@ if (
     " A manual state-rate override is recommended for this transaction.";
 
 }
-```
 
 } else {
 
-```
 stateTax =
   taxableAmount
   *
   rate;
-```
 
 }
 
@@ -1476,7 +1432,6 @@ inputs.localTaxRate;
 
 return {
 
-```
 state,
 
 taxableAmount,
@@ -1496,7 +1451,6 @@ explanation,
 
 modelStatus:
   state.modelStatus
-```
 
 };
 
@@ -1691,7 +1645,6 @@ taxType ===
 "ordinary"
 ) {
 
-```
 federalTax =
   grossIncome
   *
@@ -1701,7 +1654,6 @@ stateTax =
   grossIncome
   *
   stateRate;
-```
 
 }
 
@@ -1710,7 +1662,6 @@ taxType ===
 "qualifiedDividend"
 ) {
 
-```
 federalTax =
   grossIncome
   *
@@ -1720,7 +1671,6 @@ stateTax =
   grossIncome
   *
   stateRate;
-```
 
 }
 
@@ -1729,7 +1679,6 @@ taxType ===
 "mixedDividend"
 ) {
 
-```
 const qualifiedShare =
   Number.isFinite(
     asset
@@ -1762,7 +1711,6 @@ stateTax =
   grossIncome
   *
   stateRate;
-```
 
 }
 
@@ -1771,7 +1719,6 @@ taxType ===
 "capitalGain"
 ) {
 
-```
 federalTax =
   grossIncome
   *
@@ -1785,7 +1732,6 @@ stateTax =
     : grossIncome
       *
       stateRate;
-```
 
 }
 
@@ -1794,14 +1740,12 @@ taxType ===
 "treasuryInterest"
 ) {
 
-```
 federalTax =
   grossIncome
   *
   ordinaryFederalRate;
 
 stateTax = 0;
-```
 
 }
 
@@ -1810,7 +1754,6 @@ taxType ===
 "municipalInterest"
 ) {
 
-```
 federalTax = 0;
 
 /*
@@ -1820,7 +1763,6 @@ federalTax = 0;
 */
 
 stateTax = 0;
-```
 
 }
 
@@ -1829,7 +1771,6 @@ taxType ===
 "reitDistribution"
 ) {
 
-```
 federalTax =
   grossIncome
   *
@@ -1839,7 +1780,6 @@ stateTax =
   grossIncome
   *
   stateRate;
-```
 
 }
 
@@ -1848,11 +1788,9 @@ taxType ===
 "taxDeferred"
 ) {
 
-```
 federalTax = 0;
 
 stateTax = 0;
-```
 
 }
 
@@ -1861,11 +1799,9 @@ taxType ===
 "rothTaxFree"
 ) {
 
-```
 federalTax = 0;
 
 stateTax = 0;
-```
 
 }
 
@@ -1877,7 +1813,6 @@ inputs.localTaxRate;
 const niitTax =
 calculateNIIT({
 
-```
   investmentIncome:
     grossIncome,
 
@@ -1893,11 +1828,9 @@ calculateNIIT({
     inputs.niitMode
 
 });
-```
 
 return {
 
-```
 federalTax,
 
 stateTax,
@@ -1914,7 +1847,6 @@ totalTax:
   localTax
   +
   niitTax
-```
 
 };
 
@@ -1941,7 +1873,6 @@ const rows =
 normalizedAllocation.map(
 asset => {
 
-```
     const allocationFraction =
       asset.allocation
       /
@@ -2024,7 +1955,6 @@ asset => {
 
   }
 );
-```
 
 const totals =
 rows.reduce(
@@ -2033,7 +1963,6 @@ total,
 row
 ) => {
 
-```
     total.allocatedAmount +=
       row.allocatedAmount;
 
@@ -2060,11 +1989,9 @@ row
     netIncome: 0
   }
 );
-```
 
 return {
 
-```
 rows,
 
 totals,
@@ -2085,7 +2012,6 @@ portfolioYield:
       /
       netInvestableAmount
     : 0
-```
 
 };
 
@@ -2233,7 +2159,6 @@ month <= months;
 month++
 ) {
 
-```
 balance +=
   currentMonthlyContribution;
 
@@ -2483,13 +2408,11 @@ if (
     .contributionGrowthRate;
 
 }
-```
 
 }
 
 return {
 
-```
 blended,
 
 annualReturn,
@@ -2516,7 +2439,6 @@ schedule,
 
 finalYear:
   schedule.at(-1)
-```
 
 };
 
@@ -2560,14 +2482,12 @@ strategy ===
 "none"
 ) {
 
-```
 grossAnnualIncome = 0;
 
 totalGrossPayout = 0;
 
 note =
   "The portfolio is modeled for growth without planned withdrawals.";
-```
 
 }
 
@@ -2576,7 +2496,6 @@ strategy ===
 "yieldOnly"
 ) {
 
-```
 grossAnnualIncome =
   allocationIncome
   .totals
@@ -2611,7 +2530,6 @@ for (
 
 note =
   "This strategy spends the estimated portfolio distributions while attempting to preserve nominal principal.";
-```
 
 }
 
@@ -2620,7 +2538,6 @@ strategy ===
 "safeWithdrawal"
 ) {
 
-```
 grossAnnualIncome =
   principal
   *
@@ -2672,7 +2589,6 @@ finalAnnualPayment =
 
 note =
   `Withdraws ${formatPercent(inputs.withdrawalRate)} of the starting portfolio annually while the remaining balance earns an assumed ${formatPercent(inputs.payoutReturnRate)}.`;
-```
 
 }
 
@@ -2681,7 +2597,6 @@ strategy ===
 "fixedDollar"
 ) {
 
-```
 grossAnnualIncome =
   inputs.desiredMonthlyIncome
   *
@@ -2728,7 +2643,6 @@ finalAnnualPayment =
 
 note =
   `Targets ${formatCurrency(inputs.desiredMonthlyIncome)} per month before payout taxes.`;
-```
 
 }
 
@@ -2737,7 +2651,6 @@ strategy ===
 "fixedPeriodAnnuity"
 ) {
 
-```
 const annualRate =
   inputs.payoutReturnRate;
 
@@ -2821,7 +2734,6 @@ for (
 
 note =
   "The payment is calculated to spend principal and assumed investment earnings over the selected payout period.";
-```
 
 }
 
@@ -2830,7 +2742,6 @@ strategy ===
 "lotteryInstallments"
 ) {
 
-```
 const years =
   inputs.payoutYears;
 
@@ -2903,7 +2814,6 @@ finalAnnualPayment =
 
 note =
   `Payments begin at ${formatCurrency(firstAnnualPayment)} and increase ${formatPercent(growthRate)} annually.`;
-```
 
 }
 
@@ -2937,7 +2847,6 @@ payoutTaxRate
 
 return {
 
-```
 strategy,
 
 grossAnnualIncome,
@@ -2961,7 +2870,6 @@ paymentSeries,
 balanceSeries,
 
 note
-```
 
 };
 
@@ -2975,7 +2883,6 @@ function calculateWealthScope() {
 
 try {
 
-```
 hideStatus();
 
 const inputs =
@@ -3125,17 +3032,14 @@ return (
   WealthScopeApp
   .latestCalculation
 );
-```
 
 } catch (error) {
 
-```
 handleApplicationError(
   error
 );
 
 return null;
-```
 
 }
 
@@ -3343,7 +3247,6 @@ getElement(
 
 if (totalLine) {
 
-```
 totalLine.classList.toggle(
   "is-invalid",
   Math.abs(
@@ -3354,7 +3257,6 @@ totalLine.classList.toggle(
   >
   0.05
 );
-```
 
 }
 
@@ -3496,7 +3398,6 @@ normalized
 .map(
 asset => {
 
-```
     const income =
       incomeById.get(
         asset.id
@@ -3601,7 +3502,7 @@ asset => {
                   data-remove-asset="${escapeHtml(asset.id)}"
                   aria-label="Remove ${escapeHtml(asset.name)}"
                 >
-                  ×
+                  &times;
                 </button>
               `
               : ""
@@ -3615,7 +3516,6 @@ asset => {
   }
 )
 .join("");
-```
 
 body
 .querySelectorAll(
@@ -3624,7 +3524,6 @@ body
 .forEach(
 input => {
 
-```
   input.addEventListener(
     "change",
     event => {
@@ -3648,7 +3547,6 @@ input => {
   );
 
 }
-```
 
 );
 
@@ -3659,7 +3557,6 @@ body
 .forEach(
 button => {
 
-```
   button.addEventListener(
     "click",
     event => {
@@ -3675,7 +3572,6 @@ button => {
   );
 
 }
-```
 
 );
 
@@ -4018,7 +3914,6 @@ row.taxableAmount > 0
 .map(
 row => {
 
-```
     const maximumText =
       row.maximum === null
         ? "and above"
@@ -4031,7 +3926,7 @@ row => {
 
         <td>
           ${formatCurrency(row.minimum)}
-          –
+          -
           ${maximumText}
         </td>
 
@@ -4053,7 +3948,6 @@ row => {
   }
 )
 .join("");
-```
 
 }
 
@@ -4072,7 +3966,6 @@ return;
 
 const badges = [
 
-```
 StateData
 .taxMethods[
   state.taxMethod
@@ -4092,7 +3985,6 @@ state.localIncomeTaxPossible
 state.treasuryInterestStateExempt
   ? "Treasury interest state-exempt"
   : "Treasury treatment review"
-```
 
 ].filter(Boolean);
 
@@ -4248,7 +4140,6 @@ getElement(
 
 if (progressBar) {
 
-```
 progressBar.style.width =
   `${clamp(
     coverage
@@ -4257,7 +4148,6 @@ progressBar.style.width =
     0,
     100
   )}%`;
-```
 
 }
 
@@ -4306,7 +4196,6 @@ total,
 row
 ) => {
 
-```
   if (
     row.taxType ===
     "qualifiedDividend"
@@ -4344,7 +4233,6 @@ row
 
 },
 0
-```
 
 );
 
@@ -4360,7 +4248,6 @@ total,
 row
 ) => {
 
-```
   if (
     row.taxType ===
     "mixedDividend"
@@ -4389,7 +4276,6 @@ row
 
 },
 0
-```
 
 );
 
@@ -4418,7 +4304,6 @@ row.allocatedAmount > 0
 .map(
 row => ` <tr>
 
-```
       <td>
         ${escapeHtml(row.name)}
       </td>
@@ -4451,7 +4336,6 @@ row => ` <tr>
   `
 )
 .join("");
-```
 
 }
 
@@ -4496,7 +4380,7 @@ setText(
         conservative
         .inflationAdjustedValue
       )
-    } in today’s dollars`
+    } in today's dollars`
 );
 
 setText(
@@ -4514,7 +4398,7 @@ setText(
         planning
         .inflationAdjustedValue
       )
-    } in today’s dollars`
+    } in today's dollars`
 );
 
 setText(
@@ -4532,7 +4416,7 @@ setText(
         speculative
         .inflationAdjustedValue
       )
-    } in today’s dollars`
+    } in today's dollars`
 );
 
 renderScenarioGrowthChart(
@@ -4681,7 +4565,6 @@ calculation
 .map(
 row => ` <tr>
 
-```
       <td>
         ${row.year}
       </td>
@@ -4734,7 +4617,6 @@ row => ` <tr>
   `
 )
 .join("");
-```
 
 }
 
@@ -4754,16 +4636,183 @@ chartName
 
 if (chart) {
 
-```
 chart.destroy();
 
 WealthScopeApp
 .charts[
   chartName
 ] = null;
-```
 
 }
+
+}
+
+function renderCanvasDoughnut(
+canvas,
+rows
+) {
+
+const context =
+canvas.getContext("2d");
+
+if (!context) {
+return;
+}
+
+const width =
+canvas.clientWidth
+||
+420;
+
+const height =
+canvas.clientHeight
+||
+320;
+
+const pixelRatio =
+window.devicePixelRatio
+||
+1;
+
+canvas.width =
+Math.round(
+width
+*
+pixelRatio
+);
+
+canvas.height =
+Math.round(
+height
+*
+pixelRatio
+);
+
+context.setTransform(
+pixelRatio,
+0,
+0,
+pixelRatio,
+0,
+0
+);
+
+context.clearRect(
+0,
+0,
+width,
+height
+);
+
+const total =
+rows.reduce(
+(
+sum,
+row
+) =>
+sum
++
+row.allocatedAmount,
+0
+);
+
+if (total <= 0) {
+return;
+}
+
+const centerX =
+width
+/
+2;
+
+const centerY =
+height
+/
+2
+-
+10;
+
+const radius =
+Math.max(
+45,
+Math.min(
+width,
+height
+)
+*
+0.30
+);
+
+let angle =
+-Math.PI
+/
+2;
+
+rows.forEach(
+(
+row,
+index
+) => {
+
+  const slice =
+    row.allocatedAmount
+    /
+    total
+    *
+    Math.PI
+    *
+    2;
+
+  context.beginPath();
+  context.arc(
+    centerX,
+    centerY,
+    radius,
+    angle,
+    angle
+    +
+    slice
+  );
+  context.arc(
+    centerX,
+    centerY,
+    radius
+    *
+    0.58,
+    angle
+    +
+    slice,
+    angle,
+    true
+  );
+  context.closePath();
+  context.fillStyle =
+    row.color
+    ||
+    WealthScopeApp.colors[
+      index
+      %
+      WealthScopeApp.colors.length
+    ];
+  context.fill();
+  angle += slice;
+
+}
+);
+
+context.fillStyle =
+"#D4E2ED";
+context.font =
+"600 13px system-ui, sans-serif";
+context.textAlign =
+"center";
+context.fillText(
+"Allocation",
+centerX,
+centerY
++
+4
+);
 
 }
 
@@ -4774,7 +4823,6 @@ stacked = false
 
 return {
 
-```
 responsive: true,
 
 maintainAspectRatio: false,
@@ -4879,7 +4927,6 @@ scales: {
   }
 
 }
-```
 
 };
 
@@ -4905,9 +4952,7 @@ typeof Chart ===
 "undefined"
 ) {
 
-```
 return;
-```
 
 }
 
@@ -4927,7 +4972,6 @@ new Chart(
 canvas,
 {
 
-```
     type: "line",
 
     data: {
@@ -5010,7 +5054,7 @@ canvas,
         {
 
           label:
-            "Today’s dollars",
+            "today's dollars",
 
           data:
             [
@@ -5050,7 +5094,6 @@ canvas,
 
   }
 );
-```
 
 }
 
@@ -5069,14 +5112,9 @@ getElement(
 
 if (
 !canvas
-||
-typeof Chart ===
-"undefined"
 ) {
 
-```
 return;
-```
 
 }
 
@@ -5093,6 +5131,20 @@ row =>
 row.allocation > 0
 );
 
+if (
+typeof Chart ===
+"undefined"
+) {
+
+renderCanvasDoughnut(
+canvas,
+rows
+);
+
+return;
+
+}
+
 WealthScopeApp
 .charts
 .allocation =
@@ -5100,7 +5152,6 @@ new Chart(
 canvas,
 {
 
-```
     type: "doughnut",
 
     data: {
@@ -5221,7 +5272,6 @@ canvas,
 
   }
 );
-```
 
 }
 
@@ -5245,9 +5295,7 @@ typeof Chart ===
 "undefined"
 ) {
 
-```
 return;
-```
 
 }
 
@@ -5271,7 +5319,6 @@ new Chart(
 canvas,
 {
 
-```
     type: "bar",
 
     data: {
@@ -5337,7 +5384,6 @@ canvas,
 
   }
 );
-```
 
 }
 
@@ -5361,9 +5407,7 @@ typeof Chart ===
 "undefined"
 ) {
 
-```
 return;
-```
 
 }
 
@@ -5373,7 +5417,6 @@ destroyChart(
 
 const scenarioEntries = [
 
-```
 {
   label:
     "Conservative 4.5%",
@@ -5412,7 +5455,6 @@ const scenarioEntries = [
   color:
     "#FF8293"
 }
-```
 
 ];
 
@@ -5443,7 +5485,6 @@ new Chart(
 canvas,
 {
 
-```
     type: "line",
 
     data: {
@@ -5490,7 +5531,6 @@ canvas,
 
   }
 );
-```
 
 }
 
@@ -5514,9 +5554,7 @@ typeof Chart ===
 "undefined"
 ) {
 
-```
 return;
-```
 
 }
 
@@ -5554,7 +5592,6 @@ new Chart(
 canvas,
 {
 
-```
     type: "line",
 
     data: {
@@ -5619,7 +5656,6 @@ canvas,
 
   }
 );
-```
 
 }
 
@@ -5727,13 +5763,11 @@ document
 .forEach(
 element => {
 
-```
   element.hidden =
     WealthScopeApp.mode !==
     "advanced";
 
 }
-```
 
 );
 
@@ -5753,7 +5787,6 @@ simpleButton
 advancedButton
 ) {
 
-```
 const simpleActive =
   WealthScopeApp.mode ===
   "simple";
@@ -5785,7 +5818,6 @@ advancedButton.setAttribute(
     !simpleActive
   )
 );
-```
 
 }
 
@@ -5806,7 +5838,6 @@ document
 .forEach(
 button => {
 
-```
   const active =
     button
     .dataset
@@ -5826,7 +5857,6 @@ button => {
   );
 
 }
-```
 
 );
 
@@ -5837,7 +5867,6 @@ document
 .forEach(
 view => {
 
-```
   const active =
     view.id ===
     viewId;
@@ -5853,7 +5882,6 @@ view => {
   );
 
 }
-```
 
 );
 
@@ -5864,7 +5892,6 @@ Chart.js may need a resize after a hidden tab becomes visible.
 window.setTimeout(
 () => {
 
-```
   Object
   .values(
     WealthScopeApp
@@ -5882,7 +5909,6 @@ window.setTimeout(
 
 },
 50
-```
 
 );
 
@@ -5906,9 +5932,7 @@ typeof dialog.showModal ===
 "function"
 ) {
 
-```
 dialog.showModal();
-```
 
 }
 
@@ -5925,14 +5949,12 @@ getString(
 
 if (!name) {
 
-```
 showStatus(
   "Enter a name for the custom asset.",
   "error"
 );
 
 return;
-```
 
 }
 
@@ -5984,7 +6006,6 @@ getString(
 
 const mappedTaxType = {
 
-```
 ordinary:
   "ordinary",
 
@@ -6002,7 +6023,6 @@ federalExemptInterest:
 
 taxFree:
   "rothTaxFree"
-```
 
 }[
 selectedTaxType
@@ -6014,7 +6034,6 @@ const customAsset =
 AssetHelpers
 .createCustomAsset({
 
-```
   id:
     `custom-${Date.now()}`,
 
@@ -6044,7 +6063,6 @@ AssetHelpers
     ]
 
 });
-```
 
 WealthScopeApp
 .allocationRows
@@ -6078,7 +6096,6 @@ function getSavedScenarios() {
 
 try {
 
-```
 const raw =
   localStorage
   .getItem(
@@ -6095,18 +6112,15 @@ const parsed =
 return Array.isArray(parsed)
   ? parsed
   : [];
-```
 
 } catch (error) {
 
-```
 console.warn(
   "Could not read saved scenarios.",
   error
 );
 
 return [];
-```
 
 }
 
@@ -6137,7 +6151,6 @@ document
 .forEach(
 element => {
 
-```
   if (!element.id) {
     return;
   }
@@ -6148,13 +6161,11 @@ element => {
     element.value;
 
 }
-```
 
 );
 
 return {
 
-```
 mode:
   WealthScopeApp.mode,
 
@@ -6168,7 +6179,6 @@ allocationRows:
       ...row
     })
   )
-```
 
 };
 
@@ -6184,11 +6194,9 @@ return;
 
 if (state.mode) {
 
-```
 setApplicationMode(
   state.mode
 );
-```
 
 }
 
@@ -6199,7 +6207,6 @@ typeof state.values ===
 "object"
 ) {
 
-```
 Object
 .entries(
   state.values
@@ -6221,7 +6228,6 @@ Object
 
   }
 );
-```
 
 }
 
@@ -6236,7 +6242,6 @@ state
 .length > 0
 ) {
 
-```
 WealthScopeApp
 .allocationRows =
   state
@@ -6246,7 +6251,6 @@ WealthScopeApp
       ...row
     })
   );
-```
 
 }
 
@@ -6268,9 +6272,7 @@ typeof dialog.showModal ===
 "function"
 ) {
 
-```
 dialog.showModal();
-```
 
 }
 
@@ -6287,14 +6289,12 @@ getString(
 
 if (!name) {
 
-```
 showStatus(
   "Enter a scenario name.",
   "error"
 );
 
 return;
-```
 
 }
 
@@ -6303,7 +6303,6 @@ getSavedScenarios();
 
 scenarios.push({
 
-```
 id:
   `scenario-${Date.now()}`,
 
@@ -6315,7 +6314,6 @@ savedAt:
 
 state:
   captureFormState()
-```
 
 });
 
@@ -6364,9 +6362,7 @@ typeof dialog.showModal ===
 "function"
 ) {
 
-```
 dialog.showModal();
-```
 
 }
 
@@ -6390,7 +6386,6 @@ if (
 scenarios.length === 0
 ) {
 
-```
 container.innerHTML = `
   <div class="saved-scenario-empty">
     No scenarios have been saved yet.
@@ -6398,7 +6393,6 @@ container.innerHTML = `
 `;
 
 return;
-```
 
 }
 
@@ -6407,7 +6401,6 @@ scenarios
 .map(
 scenario => {
 
-```
     const savedDate =
       new Date(
         scenario.savedAt
@@ -6453,7 +6446,6 @@ scenario => {
   }
 )
 .join("");
-```
 
 container
 .querySelectorAll(
@@ -6462,7 +6454,6 @@ container
 .forEach(
 button => {
 
-```
   button.addEventListener(
     "click",
     event => {
@@ -6478,7 +6469,6 @@ button => {
   );
 
 }
-```
 
 );
 
@@ -6489,7 +6479,6 @@ container
 .forEach(
 button => {
 
-```
   button.addEventListener(
     "click",
     event => {
@@ -6505,7 +6494,6 @@ button => {
   );
 
 }
-```
 
 );
 
@@ -6571,6 +6559,60 @@ renderSavedScenarioList();
 EXPORTS
 ========================================================= */
 
+function buildScheduleCsv(
+rows
+) {
+
+const header = [
+"Year",
+"Starting Balance",
+"Contributions",
+"Gross Growth",
+"Income",
+"Fees",
+"Tax Drag",
+"Ending Balance",
+"Cost Basis",
+"Liquidation Tax",
+"Net Liquidation Value",
+"Inflation Adjusted Value"
+];
+
+const dataRows =
+rows.map(
+row => [
+  row.year,
+  row.startingBalance,
+  row.contributions,
+  row.grossGrowth,
+  row.income,
+  row.fees,
+  row.taxDrag,
+  row.endingBalance,
+  row.costBasis,
+  row.liquidationTax,
+  row.netLiquidationValue,
+  row.inflationAdjustedValue
+]
+);
+
+return [
+header,
+...dataRows
+]
+.map(
+row =>
+  row
+  .map(
+    value =>
+      `"${String(value).replaceAll('"', '""')}"`
+  )
+  .join(",")
+)
+.join("\n");
+
+}
+
 function downloadScheduleCsv() {
 
 const rows =
@@ -6583,105 +6625,19 @@ if (
 rows.length === 0
 ) {
 
-```
 showStatus(
   "There is no annual schedule to export.",
   "error"
 );
 
 return;
-```
 
 }
 
-const header = [
-
-```
-"Year",
-
-"Starting Balance",
-
-"Contributions",
-
-"Gross Growth",
-
-"Income",
-
-"Fees",
-
-"Tax Drag",
-
-"Ending Balance",
-
-"Cost Basis",
-
-"Liquidation Tax",
-
-"Net Liquidation Value",
-
-"Inflation Adjusted Value"
-```
-
-];
-
-const dataRows =
-rows.map(
-row => [
-
-```
-    row.year,
-
-    row.startingBalance,
-
-    row.contributions,
-
-    row.grossGrowth,
-
-    row.income,
-
-    row.fees,
-
-    row.taxDrag,
-
-    row.endingBalance,
-
-    row.costBasis,
-
-    row.liquidationTax,
-
-    row.netLiquidationValue,
-
-    row.inflationAdjustedValue
-
-  ]
-);
-```
-
 const csv =
-[
-header,
-...dataRows
-]
-.map(
-row =>
-row
-.map(
-value => {
-
-```
-        const text =
-          String(value);
-
-        return (
-          `"${text.replaceAll('"', '""')}"`
-        );
-
-      }
-    )
-    .join(",")
-)
-.join("\n");
-```
+buildScheduleCsv(
+rows
+);
 
 const blob =
 new Blob(
@@ -6731,9 +6687,7 @@ if (
 .latestCalculation
 ) {
 
-```
 calculateWealthScope();
-```
 
 }
 
@@ -6756,7 +6710,6 @@ return function debounced(
 ...argumentsList
 ) {
 
-```
 window.clearTimeout(
   timeoutId
 );
@@ -6769,7 +6722,6 @@ timeoutId =
       ),
     delay
   );
-```
 
 };
 
@@ -6790,7 +6742,6 @@ document
 .forEach(
 element => {
 
-```
   element.addEventListener(
     "input",
     debouncedCalculate
@@ -6802,7 +6753,6 @@ element => {
   );
 
 }
-```
 
 );
 
@@ -6821,7 +6771,6 @@ getElement(
 "click",
 () => {
 
-```
   setApplicationMode(
     "simple"
   );
@@ -6829,7 +6778,6 @@ getElement(
   calculateWealthScope();
 
 }
-```
 
 );
 
@@ -6840,7 +6788,6 @@ getElement(
 "click",
 () => {
 
-```
   setApplicationMode(
     "advanced"
   );
@@ -6848,7 +6795,6 @@ getElement(
   calculateWealthScope();
 
 }
-```
 
 );
 
@@ -6859,7 +6805,6 @@ getElement(
 "change",
 event => {
 
-```
   const profileId =
     event
     .currentTarget
@@ -6872,7 +6817,6 @@ event => {
   calculateWealthScope();
 
 }
-```
 
 );
 
@@ -6883,7 +6827,6 @@ document
 .forEach(
 button => {
 
-```
   button.addEventListener(
     "click",
     event => {
@@ -6899,7 +6842,6 @@ button => {
   );
 
 }
-```
 
 );
 
@@ -6910,7 +6852,6 @@ getElement(
 "click",
 () => {
 
-```
   normalizeCurrentAllocation();
 
   setRiskProfileToCustom();
@@ -6918,7 +6859,6 @@ getElement(
   calculateWealthScope();
 
 }
-```
 
 );
 
@@ -6969,14 +6909,12 @@ getElement(
 "click",
 () => {
 
-```
   getElement(
     "loadScenarioDialog"
   )
   ?.close();
 
 }
-```
 
 );
 
@@ -7009,7 +6947,6 @@ window.addEventListener(
 debounce(
 () => {
 
-```
     Object
     .values(
       WealthScopeApp
@@ -7028,9 +6965,218 @@ debounce(
   },
   120
 )
-```
 
 );
+
+}
+
+function runAutomatedTests() {
+
+const tests = [];
+
+function test(
+name,
+callback
+) {
+
+  try {
+
+    callback();
+
+    tests.push({
+      name,
+      passed: true
+    });
+
+  } catch (error) {
+
+    tests.push({
+      name,
+      passed: false,
+      error:
+        error.message
+    });
+
+  }
+
+}
+
+function assert(
+condition,
+message
+) {
+
+  if (!condition) {
+    throw new Error(message);
+  }
+
+}
+
+test(
+"2026 single progressive brackets",
+() => {
+
+  const result =
+    calculateProgressiveTax(
+      50400,
+      FederalData
+      .filingStatuses
+      .single
+      .ordinaryIncomeBrackets
+    );
+
+  assert(
+    Math.abs(
+      result.totalTax
+      -
+      5800
+    )
+    <
+    0.01,
+    `Expected $5,800, received ${result.totalTax}`
+  );
+
+}
+);
+
+test(
+"allocation normalization",
+() => {
+
+  const rows =
+    AssetHelpers
+    .normalizeAllocation([
+      { allocation: 30 },
+      { allocation: 30 }
+    ]);
+
+  assert(
+    rows.every(
+      row =>
+        Math.abs(
+          row.allocation
+          -
+          50
+        )
+        <
+        0.001
+    ),
+    "Expected two 50% rows"
+  );
+
+}
+);
+
+test(
+"all states plus District of Columbia",
+() => {
+
+  const states =
+    StateHelpers
+    .getSortedStateList();
+
+  assert(
+    states.length ===
+    51,
+    `Expected 51 jurisdictions, received ${states.length}`
+  );
+
+  assert(
+    StateHelpers
+    .getStateByCode("DC")
+    ?.name ===
+    "District of Columbia",
+    "District of Columbia is missing"
+  );
+
+}
+);
+
+test(
+"default calculation remains finite",
+() => {
+
+  assert(
+    WealthScopeApp
+    .latestCalculation
+    &&
+    Number.isFinite(
+      WealthScopeApp
+      .latestCalculation
+      .projection
+      .finalYear
+      .netLiquidationValue
+    ),
+    "Default projection is not finite"
+  );
+
+}
+);
+
+test(
+"CSV export includes every schedule row",
+() => {
+
+  const rows =
+    WealthScopeApp
+    .latestSchedule;
+
+  const csv =
+    buildScheduleCsv(
+      rows
+    );
+
+  assert(
+    csv.startsWith(
+      "\"Year\",\"Starting Balance\""
+    ),
+    "CSV header is invalid"
+  );
+
+  assert(
+    csv.split("\n").length ===
+    rows.length
+    +
+    1,
+    "CSV row count does not match the schedule"
+  );
+
+}
+);
+
+const results = {
+passed:
+  tests.every(
+    item =>
+      item.passed
+  ),
+tests
+};
+
+window
+.WEALTHSCOPE_TEST_RESULTS =
+results;
+
+document
+.documentElement
+.dataset
+.wealthscopeTests =
+results.passed
+? "passed"
+: "failed";
+
+console[
+results.passed
+? "info"
+: "error"
+](
+"WealthScope self-tests",
+JSON.stringify(
+results
+)
+);
+
+return results;
 
 }
 
@@ -7042,7 +7188,6 @@ function initializeWealthScope() {
 
 try {
 
-```
 validateDatasets();
 
 populateStateSelector();
@@ -7066,18 +7211,26 @@ activateResultView(
 
 calculateWealthScope();
 
+if (
+new URLSearchParams(
+window.location.search
+)
+.has("tests")
+) {
+
+runAutomatedTests();
+
+}
+
 console.info(
-  "WealthScope initialized successfully."
+"WealthScope initialized successfully."
 );
-```
 
 } catch (error) {
 
-```
 handleApplicationError(
   error
 );
-```
 
 }
 

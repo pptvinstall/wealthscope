@@ -1,115 +1,94 @@
-/**
- * Federal Tax Data for 2026
- * Contains tax brackets, deductions, and thresholds for all filing statuses
- */
+"use strict";
 
+/*
+ * 2026 federal planning data.
+ * Source: IRS Revenue Procedure 2025-32.
+ * This calculator intentionally models only the listed provisions and is not
+ * a substitute for a complete tax return.
+ */
 window.WEALTHSCOPE_FEDERAL_2026 = {
   taxYear: 2026,
-  
+  sourceUrl: "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
   filingStatuses: {
     single: {
       name: "Single",
-      standardDeduction: 15000,
+      standardDeduction: 16100,
       ordinaryIncomeBrackets: [
-        { minimum: 0, maximum: 11600, rate: 0.10 },
-        { minimum: 11600, maximum: 47150, rate: 0.12 },
-        { minimum: 47150, maximum: 100525, rate: 0.22 },
-        { minimum: 100525, maximum: 191950, rate: 0.24 },
-        { minimum: 191950, maximum: 243725, rate: 0.32 },
-        { minimum: 243725, maximum: 609350, rate: 0.35 },
-        { minimum: 609350, maximum: null, rate: 0.37 }
+        { minimum: 0, maximum: 12400, rate: 0.10 },
+        { minimum: 12400, maximum: 50400, rate: 0.12 },
+        { minimum: 50400, maximum: 105700, rate: 0.22 },
+        { minimum: 105700, maximum: 201775, rate: 0.24 },
+        { minimum: 201775, maximum: 256225, rate: 0.32 },
+        { minimum: 256225, maximum: 640600, rate: 0.35 },
+        { minimum: 640600, maximum: null, rate: 0.37 }
       ],
       longTermCapitalGainBrackets: [
-        { minimum: 0, maximum: 47025, rate: 0.00 },
-        { minimum: 47025, maximum: 518900, rate: 0.15 },
-        { minimum: 518900, maximum: null, rate: 0.20 }
+        { minimum: 0, maximum: 49450, rate: 0 },
+        { minimum: 49450, maximum: 545500, rate: 0.15 },
+        { minimum: 545500, maximum: null, rate: 0.20 }
       ],
       netInvestmentIncomeTaxThreshold: 200000
     },
     marriedJoint: {
       name: "Married Filing Jointly",
-      standardDeduction: 30000,
+      standardDeduction: 32200,
       ordinaryIncomeBrackets: [
-        { minimum: 0, maximum: 23200, rate: 0.10 },
-        { minimum: 23200, maximum: 94300, rate: 0.12 },
-        { minimum: 94300, maximum: 201050, rate: 0.22 },
-        { minimum: 201050, maximum: 383900, rate: 0.24 },
-        { minimum: 383900, maximum: 487450, rate: 0.32 },
-        { minimum: 487450, maximum: 731200, rate: 0.35 },
-        { minimum: 731200, maximum: null, rate: 0.37 }
+        { minimum: 0, maximum: 24800, rate: 0.10 },
+        { minimum: 24800, maximum: 100800, rate: 0.12 },
+        { minimum: 100800, maximum: 211400, rate: 0.22 },
+        { minimum: 211400, maximum: 403550, rate: 0.24 },
+        { minimum: 403550, maximum: 512450, rate: 0.32 },
+        { minimum: 512450, maximum: 768700, rate: 0.35 },
+        { minimum: 768700, maximum: null, rate: 0.37 }
       ],
       longTermCapitalGainBrackets: [
-        { minimum: 0, maximum: 94050, rate: 0.00 },
-        { minimum: 94050, maximum: 583750, rate: 0.15 },
-        { minimum: 583750, maximum: null, rate: 0.20 }
+        { minimum: 0, maximum: 98900, rate: 0 },
+        { minimum: 98900, maximum: 613700, rate: 0.15 },
+        { minimum: 613700, maximum: null, rate: 0.20 }
       ],
       netInvestmentIncomeTaxThreshold: 250000
     },
     marriedSeparate: {
       name: "Married Filing Separately",
-      standardDeduction: 15000,
+      standardDeduction: 16100,
       ordinaryIncomeBrackets: [
-        { minimum: 0, maximum: 11600, rate: 0.10 },
-        { minimum: 11600, maximum: 47150, rate: 0.12 },
-        { minimum: 47150, maximum: 100525, rate: 0.22 },
-        { minimum: 100525, maximum: 191950, rate: 0.24 },
-        { minimum: 191950, maximum: 243725, rate: 0.32 },
-        { minimum: 243725, maximum: 365600, rate: 0.35 },
-        { minimum: 365600, maximum: null, rate: 0.37 }
+        { minimum: 0, maximum: 12400, rate: 0.10 },
+        { minimum: 12400, maximum: 50400, rate: 0.12 },
+        { minimum: 50400, maximum: 105700, rate: 0.22 },
+        { minimum: 105700, maximum: 201775, rate: 0.24 },
+        { minimum: 201775, maximum: 256225, rate: 0.32 },
+        { minimum: 256225, maximum: 384350, rate: 0.35 },
+        { minimum: 384350, maximum: null, rate: 0.37 }
       ],
       longTermCapitalGainBrackets: [
-        { minimum: 0, maximum: 47025, rate: 0.00 },
-        { minimum: 47025, maximum: 291875, rate: 0.15 },
-        { minimum: 291875, maximum: null, rate: 0.20 }
+        { minimum: 0, maximum: 49450, rate: 0 },
+        { minimum: 49450, maximum: 306850, rate: 0.15 },
+        { minimum: 306850, maximum: null, rate: 0.20 }
       ],
       netInvestmentIncomeTaxThreshold: 125000
     },
     headOfHousehold: {
       name: "Head of Household",
-      standardDeduction: 22500,
+      standardDeduction: 24150,
       ordinaryIncomeBrackets: [
-        { minimum: 0, maximum: 16550, rate: 0.10 },
-        { minimum: 16550, maximum: 63100, rate: 0.12 },
-        { minimum: 63100, maximum: 100500, rate: 0.22 },
-        { minimum: 100500, maximum: 191950, rate: 0.24 },
-        { minimum: 191950, maximum: 243700, rate: 0.32 },
-        { minimum: 243700, maximum: 609350, rate: 0.35 },
-        { minimum: 609350, maximum: null, rate: 0.37 }
+        { minimum: 0, maximum: 17700, rate: 0.10 },
+        { minimum: 17700, maximum: 67450, rate: 0.12 },
+        { minimum: 67450, maximum: 105700, rate: 0.22 },
+        { minimum: 105700, maximum: 201750, rate: 0.24 },
+        { minimum: 201750, maximum: 256200, rate: 0.32 },
+        { minimum: 256200, maximum: 640600, rate: 0.35 },
+        { minimum: 640600, maximum: null, rate: 0.37 }
       ],
       longTermCapitalGainBrackets: [
-        { minimum: 0, maximum: 63000, rate: 0.00 },
-        { minimum: 63000, maximum: 551350, rate: 0.15 },
-        { minimum: 551350, maximum: null, rate: 0.20 }
+        { minimum: 0, maximum: 66200, rate: 0 },
+        { minimum: 66200, maximum: 579600, rate: 0.15 },
+        { minimum: 579600, maximum: null, rate: 0.20 }
       ],
       netInvestmentIncomeTaxThreshold: 200000
     }
   },
-
   netInvestmentIncomeTax: {
     rate: 0.038,
     name: "Net Investment Income Tax (NIIT)"
-  },
-
-  deductions: {
-    qualifyingDividends: {
-      description: "Qualified dividend income",
-      taxTreatment: "capital_gains"
-    }
-  },
-
-  credits: {
-    childTaxCredit: 2000,
-    earnedIncomeCredit: true,
-    dependentCredit: 500
-  },
-
-  alternativeMinimumTax: {
-    enabled: true,
-    exemption: {
-      single: 87900,
-      marriedJoint: 137450,
-      marriedSeparate: 68725
-    },
-    rate: 0.26
   }
 };

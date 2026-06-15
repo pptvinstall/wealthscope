@@ -1,152 +1,76 @@
-/**
- * State Tax Data for 2026
- * Contains state tax methods, rates, and special treatments
+"use strict";
+
+/*
+ * State rates are editable planning estimates, not tax-return calculations.
+ * They intentionally trade jurisdiction-specific deductions and brackets for
+ * a transparent single-rate estimate. Users can override the rate in
+ * Advanced mode.
  */
+const stateRows = [
+  ["AL", "Alabama", 0.050], ["AK", "Alaska", 0], ["AZ", "Arizona", 0.025],
+  ["AR", "Arkansas", 0.039], ["CA", "California", 0.093], ["CO", "Colorado", 0.044],
+  ["CT", "Connecticut", 0.060], ["DE", "Delaware", 0.066], ["DC", "District of Columbia", 0.085],
+  ["FL", "Florida", 0], ["GA", "Georgia", 0.0499], ["HI", "Hawaii", 0.0825],
+  ["ID", "Idaho", 0.053], ["IL", "Illinois", 0.0495], ["IN", "Indiana", 0.0295],
+  ["IA", "Iowa", 0.038], ["KS", "Kansas", 0.057], ["KY", "Kentucky", 0.035],
+  ["LA", "Louisiana", 0.030], ["ME", "Maine", 0.0715], ["MD", "Maryland", 0.0575],
+  ["MA", "Massachusetts", 0.050], ["MI", "Michigan", 0.0425], ["MN", "Minnesota", 0.0785],
+  ["MS", "Mississippi", 0.040], ["MO", "Missouri", 0.047], ["MT", "Montana", 0.059],
+  ["NE", "Nebraska", 0.052], ["NV", "Nevada", 0], ["NH", "New Hampshire", 0],
+  ["NJ", "New Jersey", 0.0637], ["NM", "New Mexico", 0.049], ["NY", "New York", 0.0685],
+  ["NC", "North Carolina", 0.0399], ["ND", "North Dakota", 0.0195], ["OH", "Ohio", 0.035],
+  ["OK", "Oklahoma", 0.0475], ["OR", "Oregon", 0.0875], ["PA", "Pennsylvania", 0.0307],
+  ["RI", "Rhode Island", 0.0599], ["SC", "South Carolina", 0.064], ["SD", "South Dakota", 0],
+  ["TN", "Tennessee", 0], ["TX", "Texas", 0], ["UT", "Utah", 0.0455],
+  ["VT", "Vermont", 0.066], ["VA", "Virginia", 0.0575], ["WA", "Washington", 0],
+  ["WV", "West Virginia", 0.0482], ["WI", "Wisconsin", 0.053], ["WY", "Wyoming", 0]
+];
+
+const noIndividualIncomeTax = new Set(["AK", "FL", "NV", "NH", "SD", "TN", "TX", "WA", "WY"]);
+
+const states = Object.fromEntries(stateRows.map(([code, name, planningRate]) => {
+  const noTax = noIndividualIncomeTax.has(code);
+  return [code, {
+    code,
+    name,
+    taxMethod: noTax ? "none" : "estimated",
+    planningRate,
+    capitalGainTreatment: noTax ? "exempt" : "taxed",
+    modelStatus: "estimated",
+    localIncomeTaxPossible: ["AL", "CO", "DC", "DE", "IN", "IA", "KY", "MD", "MI", "MO", "NY", "OH", "OR", "PA"].includes(code),
+    treasuryInterestStateExempt: !noTax,
+    standardDeductionEstimate: 0,
+    explanation: noTax
+      ? `${name} is modeled with no broad individual state income tax. Special taxes may still apply.`
+      : `${name} uses an editable ${formatRate(planningRate)} planning rate. Actual brackets, deductions, credits, and local rules vary.`
+  }];
+}));
+
+function formatRate(rate) {
+  return `${(rate * 100).toFixed(2).replace(/\.?0+$/, "")}%`;
+}
 
 window.WEALTHSCOPE_STATES_2026 = {
   defaultStateCode: "GA",
-  
+  states,
   taxMethods: {
-    none: { name: "No state income tax" },
-    limited: { name: "Limited income tax (capital gains only)" },
-    standard: { name: "Standard income tax" }
+    none: { name: "No broad state income tax estimate" },
+    estimated: { name: "Editable planning-rate estimate" }
   },
-  
   modelStatuses: {
-    full: { name: "Full model (all features)" },
-    basic: { name: "Basic model (simplified)" },
-    estimated: { name: "Estimated values" }
+    estimated: { name: "Planning estimate" }
   },
-  
   capitalGainTreatments: {
-    taxed: { name: "Taxed as ordinary income" },
-    preferred: { name: "Preferential rate" },
-    exempt: { name: "Exempt from state tax" }
+    taxed: { name: "Modeled at the planning rate" },
+    exempt: { name: "No broad state income tax estimate" }
   }
 };
 
 window.WEALTHSCOPE_STATE_HELPERS = {
-  getSortedStateList: function() {
-    return [
-      { code: "AL", name: "Alabama" },
-      { code: "AK", name: "Alaska" },
-      { code: "AZ", name: "Arizona" },
-      { code: "AR", name: "Arkansas" },
-      { code: "CA", name: "California" },
-      { code: "CO", name: "Colorado" },
-      { code: "CT", name: "Connecticut" },
-      { code: "DE", name: "Delaware" },
-      { code: "FL", name: "Florida" },
-      { code: "GA", name: "Georgia" },
-      { code: "HI", name: "Hawaii" },
-      { code: "ID", name: "Idaho" },
-      { code: "IL", name: "Illinois" },
-      { code: "IN", name: "Indiana" },
-      { code: "IA", name: "Iowa" },
-      { code: "KS", name: "Kansas" },
-      { code: "KY", name: "Kentucky" },
-      { code: "LA", name: "Louisiana" },
-      { code: "ME", name: "Maine" },
-      { code: "MD", name: "Maryland" },
-      { code: "MA", name: "Massachusetts" },
-      { code: "MI", name: "Michigan" },
-      { code: "MN", name: "Minnesota" },
-      { code: "MS", name: "Mississippi" },
-      { code: "MO", name: "Missouri" },
-      { code: "MT", name: "Montana" },
-      { code: "NE", name: "Nebraska" },
-      { code: "NV", name: "Nevada" },
-      { code: "NH", name: "New Hampshire" },
-      { code: "NJ", name: "New Jersey" },
-      { code: "NM", name: "New Mexico" },
-      { code: "NY", name: "New York" },
-      { code: "NC", name: "North Carolina" },
-      { code: "ND", name: "North Dakota" },
-      { code: "OH", name: "Ohio" },
-      { code: "OK", name: "Oklahoma" },
-      { code: "OR", name: "Oregon" },
-      { code: "PA", name: "Pennsylvania" },
-      { code: "RI", name: "Rhode Island" },
-      { code: "SC", name: "South Carolina" },
-      { code: "SD", name: "South Dakota" },
-      { code: "TN", name: "Tennessee" },
-      { code: "TX", name: "Texas" },
-      { code: "UT", name: "Utah" },
-      { code: "VT", name: "Vermont" },
-      { code: "VA", name: "Virginia" },
-      { code: "WA", name: "Washington" },
-      { code: "WV", name: "West Virginia" },
-      { code: "WI", name: "Wisconsin" },
-      { code: "WY", name: "Wyoming" }
-    ];
+  getSortedStateList() {
+    return Object.values(states).sort((a, b) => a.name.localeCompare(b.name));
   },
-  
-  getStateByCode: function(code) {
-    const states = this.getSortedStateList();
-    return states.find(s => s.code === code) || null;
-  }
-};
-
-// Extended state data with tax rates
-window.WEALTHSCOPE_STATES_2026.states = {
-  GA: {
-    code: "GA",
-    name: "Georgia",
-    taxMethod: "standard",
-    planningRate: 0.055,
-    capitalGainTreatment: "taxed",
-    modelStatus: "full",
-    localIncomeTaxPossible: false,
-    treasuryInterestStateExempt: false,
-    standardDeductionEstimate: 4100,
-    explanation: "Georgia taxes all income types at standard rates."
-  },
-  TX: {
-    code: "TX",
-    name: "Texas",
-    taxMethod: "none",
-    planningRate: 0.0,
-    capitalGainTreatment: "exempt",
-    modelStatus: "full",
-    localIncomeTaxPossible: false,
-    treasuryInterestStateExempt: true,
-    standardDeductionEstimate: 0,
-    explanation: "Texas has no state income tax."
-  },
-  FL: {
-    code: "FL",
-    name: "Florida",
-    taxMethod: "none",
-    planningRate: 0.0,
-    capitalGainTreatment: "exempt",
-    modelStatus: "full",
-    localIncomeTaxPossible: false,
-    treasuryInterestStateExempt: true,
-    standardDeductionEstimate: 0,
-    explanation: "Florida has no state income tax."
-  },
-  WA: {
-    code: "WA",
-    name: "Washington",
-    taxMethod: "limited",
-    planningRate: 0.07,
-    capitalGainTreatment: "preferred",
-    modelStatus: "basic",
-    localIncomeTaxPossible: false,
-    treasuryInterestStateExempt: true,
-    standardDeductionEstimate: 250000,
-    explanation: "Washington taxes capital gains from sales of long-term capital assets above $250k."
-  },
-  CA: {
-    code: "CA",
-    name: "California",
-    taxMethod: "standard",
-    planningRate: 0.093,
-    capitalGainTreatment: "taxed",
-    modelStatus: "full",
-    localIncomeTaxPossible: true,
-    treasuryInterestStateExempt: false,
-    standardDeductionEstimate: 5202,
-    explanation: "California has the highest state income tax rate."
+  getStateByCode(code) {
+    return states[String(code || "").toUpperCase()] || null;
   }
 };
